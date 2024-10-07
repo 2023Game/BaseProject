@@ -1,0 +1,281 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\BaseSystem\BGMData.cpp" />
+    <ClCompile Include="src\BaseSystem\CBGMManager.cpp" />
+    <ClCompile Include="src\BaseSystem\CBillBoard.cpp" />
+    <ClCompile Include="src\BaseSystem\CBillBoardImage.cpp" />
+    <ClCompile Include="src\BaseSystem\CBounds.cpp" />
+    <ClCompile Include="src\BaseSystem\CButton.cpp" />
+    <ClCompile Include="src\BaseSystem\CCamera.cpp" />
+    <ClCompile Include="src\BaseSystem\CCollider.cpp" />
+    <ClCompile Include="src\BaseSystem\CColliderCapsule.cpp" />
+    <ClCompile Include="src\BaseSystem\CColliderLine.cpp" />
+    <ClCompile Include="src\BaseSystem\CColliderMesh.cpp" />
+    <ClCompile Include="src\BaseSystem\CColliderSphere.cpp" />
+    <ClCompile Include="src\BaseSystem\CColliderTriangle.cpp" />
+    <ClCompile Include="src\BaseSystem\CCollisionManager.cpp" />
+    <ClCompile Include="src\BaseSystem\CColor.cpp" />
+    <ClCompile Include="src\BaseSystem\CDebugCamera.cpp" />
+    <ClCompile Include="src\BaseSystem\CDebugInput.cpp" />
+    <ClCompile Include="src\BaseSystem\CDebugPrint.cpp" />
+    <ClCompile Include="src\BaseSystem\CDebugProfiler.cpp" />
+    <ClCompile Include="src\BaseSystem\CDebugTimer.cpp" />
+    <ClCompile Include="src\BaseSystem\CEffect.cpp" />
+    <ClCompile Include="src\BaseSystem\CExpandButton.cpp" />
+    <ClCompile Include="src\BaseSystem\CFade.cpp" />
+    <ClCompile Include="src\BaseSystem\CFont.cpp" />
+    <ClCompile Include="src\BaseSystem\CCharaBase.cpp" />
+    <ClCompile Include="src\BaseSystem\CGamePause.cpp" />
+    <ClCompile Include="src\BaseSystem\CInput.cpp" />
+    <ClCompile Include="src\BaseSystem\CLineEffect.cpp" />
+    <ClCompile Include="src\BaseSystem\CMaterial.cpp" />
+    <ClCompile Include="src\BaseSystem\CMatrix.cpp" />
+    <ClCompile Include="src\BaseSystem\CModel.cpp" />
+    <ClCompile Include="src\BaseSystem\CModelX.cpp" />
+    <ClCompile Include="src\BaseSystem\CMyShader.cpp" />
+    <ClCompile Include="src\BaseSystem\CRect.cpp" />
+    <ClCompile Include="src\BaseSystem\CResource.cpp" />
+    <ClCompile Include="src\BaseSystem\CResourceManager.cpp" />
+    <ClCompile Include="src\BaseSystem\CSoundManager.cpp" />
+    <ClCompile Include="src\BaseSystem\CTrailEffect.cpp" />
+    <ClCompile Include="src\BaseSystem\CUIManager.cpp" />
+    <ClCompile Include="src\BaseSystem\Easing.cpp" />
+    <ClCompile Include="src\BaseSystem\Primitive.cpp" />
+    <ClCompile Include="src\BaseSystem\CQuaternion.cpp" />
+    <ClCompile Include="src\BaseSystem\CSceneBase.cpp" />
+    <ClCompile Include="src\BaseSystem\CSceneManager.cpp" />
+    <ClCompile Include="src\BaseSystem\CShader.cpp" />
+    <ClCompile Include="src\BaseSystem\CSound.cpp" />
+    <ClCompile Include="src\BaseSystem\CTask.cpp" />
+    <ClCompile Include="src\BaseSystem\CTaskManager.cpp" />
+    <ClCompile Include="src\BaseSystem\CText.cpp" />
+    <ClCompile Include="src\BaseSystem\CTexture.cpp" />
+    <ClCompile Include="src\BaseSystem\CTextureFont.cpp" />
+    <ClCompile Include="src\BaseSystem\CTransform.cpp" />
+    <ClCompile Include="src\BaseSystem\CTriangle.cpp" />
+    <ClCompile Include="src\BaseSystem\CUIBase.cpp" />
+    <ClCompile Include="src\BaseSystem\CVector.cpp" />
+    <ClCompile Include="src\BaseSystem\CObjectBase.cpp" />
+    <ClCompile Include="src\BaseSystem\Maths.cpp" />
+    <ClCompile Include="src\BaseSystem\System.cpp" />
+    <ClCompile Include="src\Game\CApplication.cpp" />
+    <ClCompile Include="src\Game\CBullet.cpp" />
+    <ClCompile Include="src\Game\CEnemy.cpp" />
+    <ClCompile Include="src\Game\CField.cpp" />
+    <ClCompile Include="src\Game\CFlame.cpp" />
+    <ClCompile Include="src\Game\CFlamethrower.cpp" />
+    <ClCompile Include="src\Game\CGameCamera.cpp" />
+    <ClCompile Include="src\Game\CGameCamera2.cpp" />
+    <ClCompile Include="src\Game\CGameMenu.cpp" />
+    <ClCompile Include="src\Game\CGameScene.cpp" />
+    <ClCompile Include="src\Game\CImage.cpp" />
+    <ClCompile Include="src\Game\CMoveFloor.cpp" />
+    <ClCompile Include="src\Game\CPlayer.cpp" />
+    <ClCompile Include="src\Game\CRideabeObject.cpp" />
+    <ClCompile Include="src\Game\CRotateFloor.cpp" />
+    <ClCompile Include="src\Game\CSlash.cpp" />
+    <ClCompile Include="src\Game\CTitleScene.cpp" />
+    <ClCompile Include="src\Game\CTitleUI.cpp" />
+    <ClCompile Include="src\Game\CXCharacter.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Test\CBootMenuScene.cpp" />
+    <ClCompile Include="src\Test\CColBase.cpp" />
+    <ClCompile Include="src\Test\CColCapsule.cpp" />
+    <ClCompile Include="src\Test\CColLine.cpp" />
+    <ClCompile Include="src\Test\CCollisionTestScene.cpp" />
+    <ClCompile Include="src\Test\CColQuad.cpp" />
+    <ClCompile Include="src\Test\CColSphere.cpp" />
+    <ClCompile Include="src\Test\CColTriangle.cpp" />
+    <ClCompile Include="src\Test\CMeasure.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\BaseSystem\BGMData.h" />
+    <ClInclude Include="src\BaseSystem\CBGMManager.h" />
+    <ClInclude Include="src\BaseSystem\CBillBoard.h" />
+    <ClInclude Include="src\BaseSystem\CBillBoardImage.h" />
+    <ClInclude Include="src\BaseSystem\CBounds.h" />
+    <ClInclude Include="src\BaseSystem\CButton.h" />
+    <ClInclude Include="src\BaseSystem\CCamera.h" />
+    <ClInclude Include="src\BaseSystem\CCollider.h" />
+    <ClInclude Include="src\BaseSystem\CColliderCapsule.h" />
+    <ClInclude Include="src\BaseSystem\CColliderLine.h" />
+    <ClInclude Include="src\BaseSystem\CColliderMesh.h" />
+    <ClInclude Include="src\BaseSystem\CColliderSphere.h" />
+    <ClInclude Include="src\BaseSystem\CColliderTriangle.h" />
+    <ClInclude Include="src\BaseSystem\CCollisionManager.h" />
+    <ClInclude Include="src\BaseSystem\CColor.h" />
+    <ClInclude Include="src\BaseSystem\CDebugCamera.h" />
+    <ClInclude Include="src\BaseSystem\CDebugInput.h" />
+    <ClInclude Include="src\BaseSystem\CDebugPrint.h" />
+    <ClInclude Include="src\BaseSystem\CDebugProfiler.h" />
+    <ClInclude Include="src\BaseSystem\CDebugTimer.h" />
+    <ClInclude Include="src\BaseSystem\CEffect.h" />
+    <ClInclude Include="src\BaseSystem\CExpandButton.h" />
+    <ClInclude Include="src\BaseSystem\CFade.h" />
+    <ClInclude Include="src\BaseSystem\CFont.h" />
+    <ClInclude Include="src\BaseSystem\CCharaBase.h" />
+    <ClInclude Include="src\BaseSystem\CGamePause.h" />
+    <ClInclude Include="src\BaseSystem\CInput.h" />
+    <ClInclude Include="src\BaseSystem\CLineEffect.h" />
+    <ClInclude Include="src\BaseSystem\CMaterial.h" />
+    <ClInclude Include="src\BaseSystem\CMatrix.h" />
+    <ClInclude Include="src\BaseSystem\CModel.h" />
+    <ClInclude Include="src\BaseSystem\CModelX.h" />
+    <ClInclude Include="src\BaseSystem\CMyShader.h" />
+    <ClInclude Include="src\BaseSystem\ColliderType.h" />
+    <ClInclude Include="src\BaseSystem\CollisionLayer.h" />
+    <ClInclude Include="src\BaseSystem\CRect.h" />
+    <ClInclude Include="src\BaseSystem\CResource.h" />
+    <ClInclude Include="src\BaseSystem\CResourceManager.h" />
+    <ClInclude Include="src\BaseSystem\CSoundManager.h" />
+    <ClInclude Include="src\BaseSystem\CTrailEffect.h" />
+    <ClInclude Include="src\BaseSystem\CUIManager.h" />
+    <ClInclude Include="src\BaseSystem\Easing.h" />
+    <ClInclude Include="src\BaseSystem\Primitive.h" />
+    <ClInclude Include="src\BaseSystem\CQuaternion.h" />
+    <ClInclude Include="src\BaseSystem\CSceneBase.h" />
+    <ClInclude Include="src\BaseSystem\CSceneManager.h" />
+    <ClInclude Include="src\BaseSystem\CShader.h" />
+    <ClInclude Include="src\BaseSystem\CSound.h" />
+    <ClInclude Include="src\BaseSystem\CTask.h" />
+    <ClInclude Include="src\BaseSystem\CTaskManager.h" />
+    <ClInclude Include="src\BaseSystem\CText.h" />
+    <ClInclude Include="src\BaseSystem\CTexture.h" />
+    <ClInclude Include="src\BaseSystem\CTextureFont.h" />
+    <ClInclude Include="src\BaseSystem\CTransform.h" />
+    <ClInclude Include="src\BaseSystem\CTriangle.h" />
+    <ClInclude Include="src\BaseSystem\CUIBase.h" />
+    <ClInclude Include="src\BaseSystem\CVector.h" />
+    <ClInclude Include="src\BaseSystem\CVertex.h" />
+    <ClInclude Include="src\BaseSystem\CObjectBase.h" />
+    <ClInclude Include="src\BaseSystem\Maths.h" />
+    <ClInclude Include="src\BaseSystem\SceneType.h" />
+    <ClInclude Include="src\BaseSystem\System.h" />
+    <ClInclude Include="src\BaseSystem\TaskPauseType.h" />
+    <ClInclude Include="src\BaseSystem\TaskPriority.h" />
+    <ClInclude Include="src\BaseSystem\ObjectTag.h" />
+    <ClInclude Include="src\BaseSystem\Time.h" />
+    <ClInclude Include="src\Define.h" />
+    <ClInclude Include="src\Game\CApplication.h" />
+    <ClInclude Include="src\Game\CBullet.h" />
+    <ClInclude Include="src\Game\CEnemy.h" />
+    <ClInclude Include="src\Game\CField.h" />
+    <ClInclude Include="src\Game\CFlame.h" />
+    <ClInclude Include="src\Game\CFlamethrower.h" />
+    <ClInclude Include="src\Game\CGameCamera.h" />
+    <ClInclude Include="src\Game\CGameCamera2.h" />
+    <ClInclude Include="src\Game\CGameMenu.h" />
+    <ClInclude Include="src\Game\CGameScene.h" />
+    <ClInclude Include="src\Game\CImage.h" />
+    <ClInclude Include="src\Game\CMoveFloor.h" />
+    <ClInclude Include="src\Game\CPlayer.h" />
+    <ClInclude Include="src\Game\CRideableObject.h" />
+    <ClInclude Include="src\Game\CRotateFloor.h" />
+    <ClInclude Include="src\Game\CSlash.h" />
+    <ClInclude Include="src\Game\CTitleUI.h" />
+    <ClInclude Include="src\Game\CTitleScene.h" />
+    <ClInclude Include="src\Game\CXCharacter.h" />
+    <ClInclude Include="src\Test\CBootMenuScene.h" />
+    <ClInclude Include="src\Test\CColBase.h" />
+    <ClInclude Include="src\Test\CColCapsule.h" />
+    <ClInclude Include="src\Test\CColLine.h" />
+    <ClInclude Include="src\Test\CCollisionTestScene.h" />
+    <ClInclude Include="src\Test\CColQuad.h" />
+    <ClInclude Include="src\Test\CColSphere.h" />
+    <ClInclude Include="src\Test\CColTriangle.h" />
+    <ClInclude Include="src\Test\CMeasure.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{8802AF2F-2920-4700-89F2-CA6778727283}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>GameProgramming</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>BaseProject</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>include;$(IncludePath)</IncludePath>
+    <LibraryPath>lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>include;$(IncludePath)</IncludePath>
+    <LibraryPath>lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;_CRT_SECURE_NO_WARNINGS;FTGL_LIBRARY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(ProjectDir)src\BaseSystem;$(ProjectDir)src\Game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>Define.h</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>NotSet</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glew32.lib;glfw3.lib;glfw3dll.lib;glut32.lib;soil.lib;freetyped.lib;ftgl_static_D.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>Disabled</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;_CRT_SECURE_NO_WARNINGS;FTGL_LIBRARY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(ProjectDir)src\BaseSystem;$(ProjectDir)src\Game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>Define.h</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>glew32.lib;glfw3_mt.lib;glut32.lib;soil.lib;freetype.lib;ftgl_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
