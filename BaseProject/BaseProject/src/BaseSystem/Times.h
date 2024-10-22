@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Time
+namespace Times
 {
 	// 目標フレームレートを取得
 	int TargetFPS();

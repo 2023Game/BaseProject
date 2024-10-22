@@ -90,7 +90,7 @@ void CXCharacter::Update(const CMatrix& matrix)
 		//アニメーションの時間を設定
 		currAnim->Time(mAnimationFrame);
 		//フレームを進める
-		mAnimationFrame += mAnimationSpeed * 60.0f * Time::DeltaTime();
+		mAnimationFrame += mAnimationSpeed * 60.0f * Times::DeltaTime();
 	}
 	else
 	{

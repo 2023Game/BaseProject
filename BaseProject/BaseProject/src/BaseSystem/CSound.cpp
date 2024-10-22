@@ -450,7 +450,7 @@ void CSound::Update()
 			//{
 			//	sound.voice->Start();
 			//}
-			sound.elapsedTime += Time::DeltaTime();
+			sound.elapsedTime += Times::DeltaTime();
 		}
 		else
 		{

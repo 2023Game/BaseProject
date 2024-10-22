@@ -104,7 +104,7 @@ void CFade::Update()
 		mFadeColor.A(mIsFadeIn ? 1.0f - alpha : alpha);
 		mpFadeImage->SetColor(mFadeColor);
 		// 経過時間加算
-		mElapsedTime += Time::DeltaTime();
+		mElapsedTime += Times::DeltaTime();
 	}
 	// フェード時間を経過した
 	else

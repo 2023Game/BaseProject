@@ -52,7 +52,7 @@ void CBullet::Update()
 	// 移動速度を計算
 	// 移動速度が残りの飛距離より大きい場合は、
 	// 残りの飛距離を移動速度とする
-	float moveSpeed = mMoveSpeed * Time::DeltaTime();
+	float moveSpeed = mMoveSpeed * Times::DeltaTime();
 	if (abs(moveSpeed) > remain)
 	{
 		moveSpeed = remain * (moveSpeed < 0.0f ? -1.0f : 1.0f);

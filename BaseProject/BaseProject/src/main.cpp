@@ -186,27 +186,27 @@ int main(void)
 }
 
 // 目標フレームレートを取得
-int Time::TargetFPS()
+int Times::TargetFPS()
 {
 	return gFPS;
 }
 
 // 計算上での1フレームの経過時間を取得
-float Time::CalcDeltaTime()
+float Times::CalcDeltaTime()
 {
 	if (gFPS == 0) return 0.0f;
 	return 1.0f / gFPS;
 }
 
 // 前回のフレームのFPSを取得
-float Time::FPS()
+float Times::FPS()
 {
 	if (gDeltaTime == 0.0f) return 0.0f;
 	return 1.0f / gDeltaTime;
 }
 
 // 前回のフレームの経過時間を取得
-float Time::DeltaTime()
+float Times::DeltaTime()
 {
 	return gDeltaTime;
 }

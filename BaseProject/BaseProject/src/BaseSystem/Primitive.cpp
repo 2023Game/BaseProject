@@ -4,15 +4,14 @@
 #include "Maths.h"
 
 // 線分を描画（3D）
-void Primitive::DrawLine(const CVector& s, const CVector& e, const CColor& color, float lineWidth)
+void Primitive::DrawLine(const CVector& s, const CVector& e,
+	const CColor& color, float lineWidth, EBlend blend)
 {
 	// 現在の行列を退避しておく
 	glPushMatrix();
 
-	// アルファブレンドを有効にする
-	glEnable(GL_BLEND);
-	// ブレンド方法を指定
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// ブレンド処理を有効化
+	Blend::EnableBlend(blend);
 	// ライトオフ
 	glDisable(GL_LIGHTING);
 
@@ -31,20 +30,22 @@ void Primitive::DrawLine(const CVector& s, const CVector& e, const CColor& color
 
 	// ライトオン
 	glEnable(GL_LIGHTING);
-	// アルファブレンド無効
-	glDisable(GL_BLEND);
+	// ブレンド処理を無効化
+	Blend::DisableBlend();
 
 	// 描画前の行列に戻す
 	glPopMatrix();
 }
 
 // 線分を描画（2D）
-void Primitive::DrawLine2D(const CVector2& s, const CVector2& e, const CColor& color, float lineWidth)
+void Primitive::DrawLine2D(const CVector2& s, const CVector2& e,
+	const CColor& color, float lineWidth, EBlend blend)
 {
 }
 
 // 球を描画
-void Primitive::DrawSphere(const CMatrix& m, float rad, const CColor& color)
+void Primitive::DrawSphere(const CMatrix& m, float rad,
+	const CColor& color, EBlend blend)
 {
 	// 現在の行列を退避しておく
 	glPushMatrix();
@@ -54,10 +55,8 @@ void Primitive::DrawSphere(const CMatrix& m, float rad, const CColor& color)
 	// 描画行列を反映
 	glMultMatrixf((sm * m).M());
 
-	// アルファブレンドを有効にする
-	glEnable(GL_BLEND);
-	// ブレンド方法を指定
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// ブレンド処理を有効化
+	Blend::EnableBlend(blend);
 	// ライトオフ
 	glDisable(GL_LIGHTING);
 
@@ -109,6 +108,8 @@ void Primitive::DrawSphere(const CMatrix& m, float rad, const CColor& color)
 
 	// ライトオン
 	glEnable(GL_LIGHTING);
+	// ブレンド処理を無効化
+	Blend::DisableBlend();
 	// アルファブレンド無効
 	glDisable(GL_BLEND);
 
@@ -117,23 +118,23 @@ void Primitive::DrawSphere(const CMatrix& m, float rad, const CColor& color)
 }
 
 // ワイヤーフレームの球を描画
-void Primitive::DrawWireSphere(const CMatrix& m, float rad, const CColor& color)
+void Primitive::DrawWireSphere(const CMatrix& m, float rad,
+	const CColor& color, EBlend blend)
 {
 	glPolygonMode(GL_FRONT, GL_LINE);
-	DrawSphere(m, rad, color);
+	DrawSphere(m, rad, color, blend);
 	glPolygonMode(GL_FRONT, GL_FILL);
 }
 
 // 三角形を描画
-void Primitive::DrawTriangle(const CVector& v0, const CVector& v1, const CVector& v2, const CColor& color)
+void Primitive::DrawTriangle(const CVector& v0, const CVector& v1, const CVector& v2,
+	const CColor& color, EBlend blend)
 {
 	// 現在の行列を退避しておく
 	glPushMatrix();
 
-	// アルファブレンドを有効にする
-	glEnable(GL_BLEND);
-	// ブレンド方法を指定
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// ブレンド処理を有効化
+	Blend::EnableBlend(blend);
 	// ライトオフ
 	glDisable(GL_LIGHTING);
 
@@ -151,15 +152,16 @@ void Primitive::DrawTriangle(const CVector& v0, const CVector& v1, const CVector
 
 	// ライトオン
 	glEnable(GL_LIGHTING);
-	// アルファブレンド無効
-	glDisable(GL_BLEND);
+	// ブレンド処理を無効化
+	Blend::DisableBlend();
 
 	// 描画前の行列に戻す
 	glPopMatrix();
 }
 
 // 板ポリゴンを描画
-void Primitive::DrawQuad(const CMatrix& m, const CVector2& size, const CColor& color)
+void Primitive::DrawQuad(const CMatrix& m, const CVector2& size,
+	const CColor& color, EBlend blend)
 {
 	// 板ポリゴンの4頂点
 	static const CVector v[4] =
@@ -176,10 +178,8 @@ void Primitive::DrawQuad(const CMatrix& m, const CVector2& size, const CColor& c
 	// 描画行列反映
 	glMultMatrixf(m.M());
 
-	// アルファブレンドを有効にする
-	glEnable(GL_BLEND);
-	// ブレンド方法を指定
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// ブレンド処理を有効化
+	Blend::EnableBlend(blend);
 	// ライトオフ
 	glDisable(GL_LIGHTING);
 
@@ -200,23 +200,24 @@ void Primitive::DrawQuad(const CMatrix& m, const CVector2& size, const CColor& c
 	glEnable(GL_LIGHTING);
 	// アルファブレンド無効
 	glDisable(GL_BLEND);
+	// ブレンド処理を無効化
+	Blend::DisableBlend();
 
 	// 描画前の行列に戻す
 	glPopMatrix();
 }
 
 // カプセルを描画
-void Primitive::DrawCapsule(const CVector& sp, const CVector& ep, float rad, const CColor& color)
+void Primitive::DrawCapsule(const CVector& sp, const CVector& ep, float rad,
+	const CColor& color, EBlend blend)
 {
 	// 現在の行列を退避しておく
 	glPushMatrix();
 
 	float height = CVector::Distance(sp, ep);
 
-	// アルファブレンドを有効にする
-	glEnable(GL_BLEND);
-	// ブレンド方法を指定
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// ブレンド処理を有効化
+	Blend::EnableBlend(blend);
 	// ライトオフ
 	glDisable(GL_LIGHTING);
 
@@ -301,17 +302,85 @@ void Primitive::DrawCapsule(const CVector& sp, const CVector& ep, float rad, con
 
 	// ライトオン
 	glEnable(GL_LIGHTING);
-	// アルファブレンド無効
-	glDisable(GL_BLEND);
+	// ブレンド処理を無効化
+	Blend::DisableBlend();
 
 	// 描画前の行列に戻す
 	glPopMatrix();
 }
 
 // ワイヤーフレームのカプセルを描画
-void Primitive::DrawWireCapsule(const CVector& sp, const CVector& ep, float rad, const CColor& color)
+void Primitive::DrawWireCapsule(const CVector& sp, const CVector& ep, float rad,
+	const CColor& color, EBlend blend)
 {
 	glPolygonMode(GL_FRONT, GL_LINE);
-	DrawCapsule(sp, ep, rad, color);
+	DrawCapsule(sp, ep, rad, color, blend);
 	glPolygonMode(GL_FRONT, GL_FILL);
+}
+
+// 扇形を描画
+void Primitive::DrawSector(const CMatrix& m, float startAngle, float endAngle,
+	float rad, const CColor& color, EBlend blend)
+{
+	// 現在の行列を退避しておく
+	glPushMatrix();
+
+	CMatrix sm;
+	sm.Scale(rad, rad, rad);
+	// 描画行列を反映
+	glMultMatrixf((sm * m).M());
+
+	// ブレンド処理有効化
+	Blend::EnableBlend(blend);
+	// ライトオフ
+	glDisable(GL_LIGHTING);
+
+	// DIFFUSE色設定
+	float col[] = { color.R(), color.G(), color.B(), color.A() };
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, col);
+	glColor4fv(col);
+
+	float start = Math::DegreeToRadian(startAngle);
+	float end = Math::DegreeToRadian(endAngle);
+
+	const int cut = 45;
+	CVector* vertex = new CVector[cut * 3];
+	float* s = new float[cut + 1];
+	float* c = new float[cut + 1];
+	for (int i = 0; i <= cut; ++i)
+	{
+		s[i] = sinf(Math::Lerp(start, end, (float)i / cut));
+		c[i] = cosf(Math::Lerp(start, end, (float)i / cut));
+	}
+
+	int idx = 0;
+	for (int i = 0; i < cut; ++i)
+	{
+		const float& is1 = s[i];
+		const float& is2 = s[i + 1];
+		const float& ic1 = c[i];
+		const float& ic2 = c[i + 1];
+		vertex[idx] = CVector::zero;
+		vertex[idx + 1] = CVector(is1, 0.0f, ic1);
+		vertex[idx + 2] = CVector(is2, 0.0f, ic2);
+		idx += 3;
+	}
+
+	// 扇形を描画
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(3, GL_FLOAT, 0, vertex);
+	glDrawArrays(GL_TRIANGLES, 0, cut * 3);
+	glDisableClientState(GL_VERTEX_ARRAY);
+
+	// ライトオン
+	glEnable(GL_LIGHTING);
+	// ブレンド処理無効化
+	Blend::DisableBlend();
+
+	// 描画前の行列に戻す
+	glPopMatrix();
+
+	delete[] vertex;
+	delete[] s;
+	delete[] c;
 }

@@ -211,7 +211,7 @@ void CTitleUI::UpdateIdle()
 			mpStartText->SetAlpha(1.0f);
 			if (mElapsedTime < START_TEXT_INTERVAL_TIME)
 			{
-				mElapsedTime += Time::DeltaTime();
+				mElapsedTime += Times::DeltaTime();
 			}
 			else
 			{
@@ -226,7 +226,7 @@ void CTitleUI::UpdateIdle()
 				// サインカーブで点滅
 				float per = sinf(M_PI * mElapsedTime / START_TEXT_BLINK_TIME);
 				mpStartText->SetAlpha(1.0f - per);
-				mElapsedTime += Time::DeltaTime();
+				mElapsedTime += Times::DeltaTime();
 			}
 			else
 			{
@@ -263,7 +263,7 @@ void CTitleUI::UpdateOpen()
 				{
 					btn->SetScale(scale);
 				}
-				mElapsedTime += Time::DeltaTime();
+				mElapsedTime += Times::DeltaTime();
 			}
 			else
 			{
@@ -279,7 +279,7 @@ void CTitleUI::UpdateOpen()
 		case 1:
 			if (mElapsedTime < OPENED_WAIT_TIME)
 			{
-				mElapsedTime += Time::DeltaTime();
+				mElapsedTime += Times::DeltaTime();
 			}
 			else
 			{

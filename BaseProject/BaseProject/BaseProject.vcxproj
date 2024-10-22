@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BaseSystem\BGMData.cpp" />
+    <ClCompile Include="src\BaseSystem\Blend.cpp" />
     <ClCompile Include="src\BaseSystem\CBGMManager.cpp" />
     <ClCompile Include="src\BaseSystem\CBillBoard.cpp" />
     <ClCompile Include="src\BaseSystem\CBillBoardImage.cpp" />
@@ -101,6 +102,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\BaseSystem\BGMData.h" />
+    <ClInclude Include="src\BaseSystem\Blend.h" />
     <ClInclude Include="src\BaseSystem\CBGMManager.h" />
     <ClInclude Include="src\BaseSystem\CBillBoard.h" />
     <ClInclude Include="src\BaseSystem\CBillBoardImage.h" />
@@ -165,7 +167,7 @@
     <ClInclude Include="src\BaseSystem\TaskPauseType.h" />
     <ClInclude Include="src\BaseSystem\TaskPriority.h" />
     <ClInclude Include="src\BaseSystem\ObjectTag.h" />
-    <ClInclude Include="src\BaseSystem\Time.h" />
+    <ClInclude Include="src\BaseSystem\Times.h" />
     <ClInclude Include="src\Define.h" />
     <ClInclude Include="src\Game\CApplication.h" />
     <ClInclude Include="src\Game\CBullet.h" />

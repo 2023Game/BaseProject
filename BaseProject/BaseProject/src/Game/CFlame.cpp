@@ -85,7 +85,7 @@ void CFlame::Update()
 	CBillBoardImage::Update();
 
 	// 炎のエフェクトを移動
-	CVector move = mMoveSpeed * Time::DeltaTime();
+	CVector move = mMoveSpeed * Times::DeltaTime();
 	Position(Position() + move);
 
 	// スケール変更時間を経過していない
@@ -103,7 +103,7 @@ void CFlame::Update()
 			Scale(CVector::one * FLAME_SCALE);
 		}
 
-		mElapsedTime += Time::DeltaTime();
+		mElapsedTime += Times::DeltaTime();
 	}
 	// 移動時間が経過したら、削除する
 	else

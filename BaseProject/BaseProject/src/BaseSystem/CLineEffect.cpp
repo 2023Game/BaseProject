@@ -174,7 +174,7 @@ void CLineEffect::Update()
 				);
 			}
 			// Œo‰ßŽžŠÔ‚ðŒv‘ª
-			mElapsedTime += Time::DeltaTime();
+			mElapsedTime += Times::DeltaTime();
 		}
 	}
 }

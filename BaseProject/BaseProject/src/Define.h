@@ -24,7 +24,8 @@
 
 
 #include "System.h"
-#include "Time.h"
+#include "Times.h"
+#include "Blend.h"
 #include "CDebugCamera.h"
 #include "CDebugPrint.h"
 #include "CDebugProfiler.h"

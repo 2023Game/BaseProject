@@ -112,7 +112,7 @@ void CTrailEffect::Update()
 			UpdateLastPoint();
 		}
 		// 更新間隔用の経過時間を加算
-		mElapsedTime += Time::DeltaTime();
+		mElapsedTime += Times::DeltaTime();
 	}
 
 	// 線のポイントの数が1個以下かつ、
@@ -138,7 +138,7 @@ void CTrailEffect::Update()
 			point->alpha = 1.0f - alpha;
 
 			// 表示時間に経過時間を加算
-			point->elapsed += Time::DeltaTime();
+			point->elapsed += Times::DeltaTime();
 		}
 		// 表示時間が終われば、取り除くリストに追加
 		else

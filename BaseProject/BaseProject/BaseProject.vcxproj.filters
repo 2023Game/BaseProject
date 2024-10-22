@@ -352,6 +352,9 @@
     <ClCompile Include="src\BaseSystem\CExpandButton.cpp">
       <Filter>ソース ファイル\BaseSystem\UI</Filter>
     </ClCompile>
+    <ClCompile Include="src\BaseSystem\Blend.cpp">
+      <Filter>ソース ファイル\BaseSystem\System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\BaseSystem\CCollider.h">
@@ -519,9 +522,6 @@
     <ClInclude Include="src\BaseSystem\CDebugTimer.h">
       <Filter>ソース ファイル\BaseSystem\Debug</Filter>
     </ClInclude>
-    <ClInclude Include="src\BaseSystem\Time.h">
-      <Filter>ソース ファイル\BaseSystem\System</Filter>
-    </ClInclude>
     <ClInclude Include="src\BaseSystem\Primitive.h">
       <Filter>ソース ファイル\BaseSystem\System</Filter>
     </ClInclude>
@@ -638,6 +638,12 @@
     </ClInclude>
     <ClInclude Include="src\BaseSystem\CExpandButton.h">
       <Filter>ソース ファイル\BaseSystem\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BaseSystem\Times.h">
+      <Filter>ソース ファイル\BaseSystem\System</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BaseSystem\Blend.h">
+      <Filter>ソース ファイル\BaseSystem\System</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

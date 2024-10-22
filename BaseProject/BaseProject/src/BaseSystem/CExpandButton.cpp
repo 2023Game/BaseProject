@@ -74,7 +74,7 @@ void CExpandButton::Update()
 			mScale = Math::Lerp(mStartScale, mEndScale, per);
 			mSize = mBaseSize * mScale;
 
-			mElapsedTime += Time::DeltaTime();
+			mElapsedTime += Times::DeltaTime();
 		}
 		else
 		{

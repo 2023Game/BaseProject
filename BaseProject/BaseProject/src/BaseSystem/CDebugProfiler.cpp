@@ -63,7 +63,7 @@ void CDebugProfiler::Print()
 	if (timers.size() > 0)
 	{
 		CDebugPrint::Print("¡¡¡¡¡¡¡ Profiler ¡¡¡¡¡¡¡\n");
-		CDebugPrint::Print("%.1fFPS( Delta:%f•b )\n", Time::FPS(), Time::DeltaTime());
+		CDebugPrint::Print("%.1fFPS( Delta:%f•b )\n", Times::FPS(), Times::DeltaTime());
 		for (auto& timer : timers)
 		{
 			CDebugTimer* dt = timer.second;
@@ -74,7 +74,7 @@ void CDebugProfiler::Print()
 					"%s:Œo‰ßŽžŠÔ[%f•b]:Š„‡[%f%%%%]\n",
 					timer.first.c_str(),
 					dt->Get(),
-					(dt->Get() / Time::DeltaTime()) * 100.0f
+					(dt->Get() / Times::DeltaTime()) * 100.0f
 				);
 			}
 			else

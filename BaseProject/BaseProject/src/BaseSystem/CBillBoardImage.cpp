@@ -130,7 +130,7 @@ void CBillBoardImage::Update()
 				SetUV(uv);
 			}
 			// Œo‰ßŽžŠÔ‚ðŒv‘ª
-			mElapsedTime += Time::DeltaTime();
+			mElapsedTime += Times::DeltaTime();
 		}
 	}
 

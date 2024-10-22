@@ -141,7 +141,7 @@ void CFlamethrower::Update()
 			CreateFlame();
 			mElapsedTime -= THROW_INTERVAL;
 		}
-		mElapsedTime += Time::DeltaTime();
+		mElapsedTime += Times::DeltaTime();
 	}
 
 	// 生成済みの炎のエフェクトの削除処理

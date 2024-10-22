@@ -25,7 +25,7 @@ CSlash::~CSlash()
 // XV
 void CSlash::Update()
 {
-	CVector move = mMoveSpeed * Time::DeltaTime();
+	CVector move = mMoveSpeed * Times::DeltaTime();
 	float dist = move.Length();
 	if (mMovedDist + dist >= mKillMoveDist)
 	{

@@ -144,7 +144,7 @@ void CBGMManager::UpdateFade()
 					float alpha = mElapsedTime / mFadeTime;
 					mpCurrentBGM->SetVolume(1.0f - alpha);
 					// 経過時間を加算
-					mElapsedTime += Time::CalcDeltaTime();
+					mElapsedTime += Times::CalcDeltaTime();
 				}
 				// 経過時間が経過した
 				else
@@ -190,7 +190,7 @@ void CBGMManager::UpdateFade()
 					float alpha = mElapsedTime / mFadeTime;
 					mpNextBGM->SetVolume(alpha);
 					// 経過時間を加算
-					mElapsedTime += Time::CalcDeltaTime();
+					mElapsedTime += Times::CalcDeltaTime();
 				}
 				// 経過時間が経過した
 				else
@@ -241,7 +241,7 @@ void CBGMManager::UpdateCrossFade()
 			mpNextBGM->SetVolume(alpha);
 		}
 		// 経過時間を加算
-		mElapsedTime += Time::CalcDeltaTime();
+		mElapsedTime += Times::CalcDeltaTime();
 	}
 	// 経過時間が経過した
 	else

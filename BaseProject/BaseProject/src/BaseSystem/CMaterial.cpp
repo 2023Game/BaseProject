@@ -34,7 +34,7 @@ CTexture* CMaterial::Texture()
 void CMaterial::Disabled()
 {
 	//ブレンド処理を無効
-	DisableBlend();
+	Blend::DisableBlend();
 	//テクスチャ有り
 	if (mpTexture != nullptr && mpTexture->Id())
 	{
@@ -127,40 +127,6 @@ CMaterial::~CMaterial()
 	}
 }
 
-//ブレンド処理を有効化
-void CMaterial::EnableBlend()
-{
-	//ブレンド処理を有効
-	glEnable(GL_BLEND);
-
-	//ブレンドタイプによって処理を切り替え
-	switch (mBlendType)
-	{
-		// アルファブレンド
-		case EBlend::eAlpha:
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			break;
-		// 加算ブレンド
-		case EBlend::eAdd:
-			glBlendFunc(GL_ONE, GL_ONE);
-			break;
-		// 乗算ブレンド
-		case EBlend::eMultiply:
-			glBlendFunc(GL_ZERO, GL_SRC_COLOR);
-			break;
-		// 色反転
-		case EBlend::eInvert:
-			glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ZERO);
-			break;
-	}
-}
-
-//ブレンド処理を無効化
-void CMaterial::DisableBlend()
-{
-	glDisable(GL_BLEND);
-}
-
 //マテリアルを有効にする
 void CMaterial::Enabled(const CColor& color)
 {
@@ -174,7 +140,7 @@ void CMaterial::Enabled(const CColor& color)
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
 
 	//ブレンド処理を有効にする
-	EnableBlend();
+	Blend::EnableBlend(mBlendType);
 	//テクスチャ有り
 	if (mpTexture != nullptr && mpTexture->Id())
 	{
