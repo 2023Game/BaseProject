@@ -206,9 +206,9 @@ CRect CTexture::CalcUV(int row, int col, int num) const
 	int y = num / col;
 
 	ret.X((float)x / col);
-	ret.Y(1.0f - (float)y / row);
+	ret.Y((float)y / row);
 	ret.W(1.0f / col);
-	ret.H(-1.0f / row);
+	ret.H(1.0f / row);
 
 	return ret;
 }

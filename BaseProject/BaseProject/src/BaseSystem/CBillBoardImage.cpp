@@ -31,9 +31,9 @@ CBillBoardImage::~CBillBoardImage()
 void CBillBoardImage::SetUV(const CRect& uv)
 {
 	float l = uv.X();
-	float t = uv.Y();
+	float t = 1.0f - uv.Y();
 	float r = l + uv.W();
-	float b = t + uv.H();
+	float b = t - uv.H();
 
 	mT[0].UV
 	(
