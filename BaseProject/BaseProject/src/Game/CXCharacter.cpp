@@ -50,10 +50,11 @@ index:アニメーションの番号
 loop:true:繰り返す
 framesize:最後まで再生するのに使用されるフレーム数
 */
-void CXCharacter::ChangeAnimation(int index, bool loop, float framesize)
+void CXCharacter::ChangeAnimation(int index, bool loop,
+	float framesize, bool restart)
 {
-	//同じ場合は切り替えない
-	if (mAnimationIndex == index) return;
+	//最初から開始しない場合かつ、同じアニメーションの場合は切り替えない
+	if (!restart && mAnimationIndex == index) return;
 	//今のアニメーションの重みを0.0(0%)にする
 	mpModel->AnimationSet()[mAnimationIndex]->Weight(0.0f);
 	//番号、繰り返し、フレーム数を指定

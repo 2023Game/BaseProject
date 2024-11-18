@@ -99,11 +99,11 @@ CPlayer* CPlayer::Instance()
 }
 
 // アニメーション切り替え
-void CPlayer::ChangeAnimation(EAnimType type)
+void CPlayer::ChangeAnimation(EAnimType type, bool restart)
 {
 	if (!(EAnimType::None < type && type < EAnimType::Num)) return;
 	AnimData data = ANIM_DATA[(int)type];
-	CXCharacter::ChangeAnimation((int)type, data.loop, data.frameLength);
+	CXCharacter::ChangeAnimation((int)type, data.loop, data.frameLength, restart);
 }
 
 // 待機
@@ -130,7 +130,7 @@ void CPlayer::UpdateIdle()
 void CPlayer::UpdateAttack()
 {
 	// 攻撃アニメーションを開始
-	ChangeAnimation(EAnimType::eAttack);
+	ChangeAnimation(EAnimType::eAttack, true);
 	// 攻撃終了待ち状態へ移行
 	mState = EState::eAttackWait;
 

@@ -75,7 +75,7 @@ private:
 		Num
 	};
 	// アニメーション切り替え
-	void ChangeAnimation(EAnimType type);
+	void ChangeAnimation(EAnimType type, bool restart = false);
 
 	// プレイヤーのインスタンス
 	static CPlayer* spInstance;
