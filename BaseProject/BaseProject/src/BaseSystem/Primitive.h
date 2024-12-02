@@ -99,4 +99,24 @@ namespace Primitive
 	/// <param name="blend">ブレンドタイプ</param>
 	void DrawSector(const CMatrix& m, float startAngle, float endAngle,
 		float rad, const CColor& color, EBlend blend = EBlend::eAlpha);
+
+	/// <summary>
+	/// ボックスを描画
+	/// </summary>
+	/// <param name="center">中心座標</param>
+	/// <param name="size">各軸のサイズ</param>
+	/// <param name="color">ボックスの色</param>
+	/// <param name="blend">ブレンドタイプ</param>
+	void DrawBox(const CVector& center, const CVector& size,
+		const CColor& color, EBlend blend = EBlend::eAlpha);
+
+	/// <summary>
+	/// ワイヤーフレームのボックスを描画
+	/// </summary>
+	/// <param name="center">中心座標</param>
+	/// <param name="size">各軸のサイズ</param>
+	/// <param name="color">ボックスの色</param>
+	/// <param name="blend">ブレンドタイプ</param>
+	void DrawWireBox(const CVector& center, const CVector& size,
+		const CColor& color, EBlend blend = EBlend::eAlpha);
 };

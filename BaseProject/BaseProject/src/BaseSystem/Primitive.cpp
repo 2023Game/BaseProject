@@ -384,3 +384,117 @@ void Primitive::DrawSector(const CMatrix& m, float startAngle, float endAngle,
 	delete[] s;
 	delete[] c;
 }
+
+// ボックスの頂点データ
+CVector boxVtx[8] =
+{
+	CVector(0.5f, -0.5f, -0.5f),
+	CVector(0.5f, -0.5f,  0.5f),
+	CVector(-0.5f, -0.5f,  0.5f),
+	CVector(-0.5f, -0.5f, -0.5f),
+
+	CVector(-0.5f,  0.5f, -0.5f),
+	CVector(-0.5f,  0.5f,  0.5f),
+	CVector(0.5f,  0.5f,  0.5f),
+	CVector(0.5f,  0.5f, -0.5f),
+};
+
+// ボックス描画用のインデックスデータ
+int boxIdx[24] =
+{
+	0, 1, 2, 3,
+	4, 5, 6, 7,
+	7, 6, 1, 0,
+	5, 4, 3, 2,
+	0, 3, 4, 7,
+	6, 5, 2, 1,
+};
+
+// ワイヤーボックス描画用のインデックスデータ
+int boxWireIdx[24] =
+{
+	0, 1, 1, 2, 2, 3, 3, 0,
+	4, 5, 5, 6, 6, 7, 7, 4,
+	0, 7, 1, 6, 2, 5, 3, 4,
+};
+
+
+// ボックスを描画
+void Primitive::DrawBox(const CVector& center, const CVector& size, const CColor& color, EBlend blend)
+{
+	// 現在の行列を退避しておく
+	glPushMatrix();
+
+	CMatrix tm;
+	tm.Translate(center);
+	CMatrix sm;
+	sm.Scale(size);
+	// 描画行列を反映
+	glMultMatrixf((sm * tm).M());
+
+	// ブレンド処理有効化
+	Blend::EnableBlend(blend);
+	// ライトオフ
+	glDisable(GL_LIGHTING);
+
+	// DIFFUSE色設定
+	float col[] = { color.R(), color.G(), color.B(), color.A() };
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, col);
+	glColor4fv(col);
+
+	// 扇形を描画
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_INDEX_ARRAY);
+	glVertexPointer(3, GL_FLOAT, 0, boxVtx);
+	glDrawElements(GL_QUADS, 24, GL_UNSIGNED_INT, boxIdx);
+	glDisableClientState(GL_INDEX_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
+
+	// ライトオン
+	glEnable(GL_LIGHTING);
+	// ブレンド処理無効化
+	Blend::DisableBlend();
+
+	// 描画前の行列に戻す
+	glPopMatrix();
+}
+
+// ワイヤーフレームのボックスを描画
+void Primitive::DrawWireBox(const CVector& center, const CVector& size, const CColor& color, EBlend blend)
+{
+	// 現在の行列を退避しておく
+	glPushMatrix();
+
+	CMatrix tm;
+	tm.Translate(center);
+	CMatrix sm;
+	sm.Scale(size);
+	// 描画行列を反映
+	glMultMatrixf((sm * tm).M());
+
+	// ブレンド処理有効化
+	Blend::EnableBlend(blend);
+	// ライトオフ
+	glDisable(GL_LIGHTING);
+
+	// DIFFUSE色設定
+	float col[] = { color.R(), color.G(), color.B(), color.A() };
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, col);
+	glColor4fv(col);
+
+	// 扇形を描画
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_INDEX_ARRAY);
+	glVertexPointer(3, GL_FLOAT, 0, boxVtx);
+	glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, boxWireIdx);
+	glDisableClientState(GL_INDEX_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
+
+	// ライトオン
+	glEnable(GL_LIGHTING);
+	// ブレンド処理無効化
+	Blend::DisableBlend();
+
+	// 描画前の行列に戻す
+	glPopMatrix();
+}
