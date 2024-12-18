@@ -137,7 +137,7 @@ public:
 	/// <returns>trueならば衝突判定を行う</returns>
 	bool IsCollisionTag(ETag tag) const;
 
-	// 指定した行列にコライダーを附属させる
+	// 指定した行列にコライダーをくっつける
 	void SetAttachMtx(const CMatrix* mtx);
 
 	// 行列を取得

@@ -89,6 +89,9 @@
     <Filter Include="ソース ファイル\Game\UI\Title">
       <UniqueIdentifier>{a594cb69-7b77-4a90-8304-3ec10f740063}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Game\Character\Enemy">
+      <UniqueIdentifier>{ec280ca7-8243-49d0-adff-34255272bfe1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -155,9 +158,6 @@
       <Filter>ソース ファイル\Game</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\CPlayer.cpp">
-      <Filter>ソース ファイル\Game\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Game\CEnemy.cpp">
       <Filter>ソース ファイル\Game\Character</Filter>
     </ClCompile>
     <ClCompile Include="src\BaseSystem\CEffect.cpp">
@@ -355,6 +355,27 @@
     <ClCompile Include="src\BaseSystem\Blend.cpp">
       <Filter>ソース ファイル\BaseSystem\System</Filter>
     </ClCompile>
+    <ClCompile Include="src\Game\CSword.cpp">
+      <Filter>ソース ファイル\Game\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\CWeapon.cpp">
+      <Filter>ソース ファイル\Game\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\CGaugeUI3D.cpp">
+      <Filter>ソース ファイル\Game\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BaseSystem\CImage3D.cpp">
+      <Filter>ソース ファイル\BaseSystem\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\CEnemy.cpp">
+      <Filter>ソース ファイル\Game\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\CCactus.cpp">
+      <Filter>ソース ファイル\Game\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\CCactusNeedle.cpp">
+      <Filter>ソース ファイル\Game\Character\Enemy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\BaseSystem\CCollider.h">
@@ -424,9 +445,6 @@
       <Filter>ソース ファイル\Game</Filter>
     </ClInclude>
     <ClInclude Include="src\Game\CPlayer.h">
-      <Filter>ソース ファイル\Game\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Game\CEnemy.h">
       <Filter>ソース ファイル\Game\Character</Filter>
     </ClInclude>
     <ClInclude Include="src\BaseSystem\CEffect.h">
@@ -644,6 +662,27 @@
     </ClInclude>
     <ClInclude Include="src\BaseSystem\Blend.h">
       <Filter>ソース ファイル\BaseSystem\System</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\CSword.h">
+      <Filter>ソース ファイル\Game\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\CWeapon.h">
+      <Filter>ソース ファイル\Game\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\CGaugeUI3D.h">
+      <Filter>ソース ファイル\Game\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BaseSystem\CImage3D.h">
+      <Filter>ソース ファイル\BaseSystem\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\CEnemy.h">
+      <Filter>ソース ファイル\Game\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\CCactus.h">
+      <Filter>ソース ファイル\Game\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\CCactusNeedle.h">
+      <Filter>ソース ファイル\Game\Character\Enemy</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

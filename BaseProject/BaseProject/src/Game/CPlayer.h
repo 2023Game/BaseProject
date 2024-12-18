@@ -1,11 +1,12 @@
 #pragma once
 //キャラクタクラスのインクルード
 #include "CXCharacter.h"
-#include "CColliderLine.h"
 #include "CRideableObject.h"
 #include "CSound.h"
 
+class CCollider;
 class CFlamethrower;
+class CSword;
 
 /*
 プレイヤークラス
@@ -25,6 +26,16 @@ public:
 	// 更新
 	void Update();
 
+	// 攻撃中か
+	bool IsAttacking() const override;
+	// 攻撃開始
+	void AttackStart() override;
+	// 攻撃終了
+	void AttackEnd() override;
+
+	// ダメージを受ける
+	void TakeDamage(int damage, CObjectBase* causer) override;
+
 	/// <summary>
 	/// 衝突処理
 	/// </summary>
@@ -37,21 +48,26 @@ public:
 	void Render();
 
 private:
+	// オブジェクト削除を伝える
+	void DeleteObject(CObjectBase* obj) override;
+
 	// キーの入力情報から移動ベクトルを求める
 	CVector CalcMoveVec() const;
 
 	// 待機状態
 	void UpdateIdle();
-	// 攻撃
-	void UpdateAttack();
-	// 攻撃終了待ち
-	void UpdateAttackWait();
+	// 斬り攻撃
+	void UpdateAttack1();
+	// 蹴り攻撃
+	void UpdateAttack2();
 	// ジャンプ開始
 	void UpdateJumpStart();
 	// ジャンプ中
 	void UpdateJump();
 	// ジャンプ終了
 	void UpdateJumpEnd();
+	// 仰け反り
+	void UpdateHit();
 
 	// 移動の更新処理
 	void UpdateMove();
@@ -67,10 +83,12 @@ private:
 		eTPose,		// Tポーズ
 		eIdle,		// 待機
 		eWalk,		// 歩行
-		eAttack,	// 攻撃
+		eAttack,	// 斬り攻撃
+		eKick,		// 蹴り攻撃
 		eJumpStart,	// ジャンプ開始
 		eJump,		// ジャンプ中
 		eJumpEnd,	// ジャンプ終了
+		eHit,		// 仰け反り
 
 		Num
 	};
@@ -86,6 +104,7 @@ private:
 		std::string path;	// アニメーションデータのパス
 		bool loop;			// ループするかどうか
 		float frameLength;	// アニメーションのフレーム数
+		float speed;		// アニメーション速度（1.0で等倍）
 	};
 	// アニメーションデータのテーブル
 	static const AnimData ANIM_DATA[];
@@ -94,21 +113,28 @@ private:
 	enum class EState
 	{
 		eIdle,		// 待機
-		eAttack,	// 攻撃
-		eAttackWait,// 攻撃終了待ち
+		eAttack1,	// 斬り攻撃
+		eAttack2,	// 蹴り攻撃
 		eJumpStart,	// ジャンプ開始
 		eJump,		// ジャンプ中
 		eJumpEnd,	// ジャンプ終了
+		eHit,		// 仰け反り
 	};
-	EState mState;	// プレイヤーの状態
+	// 状態を切り替え
+	void ChangeState(EState state);
 
-	CVector mMoveSpeed;	// 前後左右の移動速度
-	float mMoveSpeedY;	// 重力やジャンプによる上下の移動速度
+	EState mState;				// プレイヤーの状態
+	int mStateStep;				// 状態内のステップ管理用
+	float mElapsedTime;			// 経過時間計測用
 
-	bool mIsGrounded;	// 接地しているかどうか
-	CVector mGroundNormal;	// 接地している地面の法線
+	CVector mMoveSpeed;			// 前後左右の移動速度
+	float mMoveSpeedY;			// 重力やジャンプによる上下の移動速度
 
-	CColliderLine* mpColliderLine;
+	bool mIsGrounded;			// 接地しているかどうか
+	CVector mGroundNormal;		// 接地している地面の法線
+
+	CCollider* mpBodyCol;		// 本体のコライダー
+	CCollider* mpAttack2Col;	// 蹴り攻撃用コライダー
 	CTransform* mpRideObject;
 
 	CSound* mpSlashSE;
@@ -120,4 +146,7 @@ private:
 
 	// モーションブラーを掛ける残り時間
 	float mMotionBlurRemainTime;
+
+	// 剣のクラス
+	CSword* mpSword;
 };

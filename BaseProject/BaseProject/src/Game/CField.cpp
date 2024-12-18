@@ -12,7 +12,7 @@ CField::CField()
 
 	mpColliderMesh = new CColliderMesh(this, ELayer::eField, mpModel, true);
 
-	CreateFieldObjects();
+	//CreateFieldObjects();
 }
 
 CField::~CField()

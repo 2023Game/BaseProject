@@ -3,8 +3,11 @@
 #include "Maths.h"
 
 // コンストラクタ
-CObjectBase::CObjectBase(ETag tag, ETaskPriority prio, int sortOrder, ETaskPauseType pause)
-	: CTask(prio, sortOrder, pause)
+CObjectBase::CObjectBase(ETag tag,
+	ETaskPriority prio, int sortOrder,
+	ETaskPauseType pause,
+	bool dontDelete, bool addTaskList)
+	: CTask(prio, sortOrder, pause, dontDelete, addTaskList)
 	, mTag(tag)
 	, mIsEnableCol(true)
 	, mDepth(0.0f)
@@ -89,6 +92,12 @@ void CObjectBase::Collision(CCollider* self, CCollider* other, const CHitInfo& h
 
 // レイとオブジェクトの衝突判定
 bool CObjectBase::CollisionRay(const CVector& start, const CVector& end, CHitInfo* hit)
+{
+	return false;
+}
+
+// 攻撃中か
+bool CObjectBase::IsAttacking() const
 {
 	return false;
 }

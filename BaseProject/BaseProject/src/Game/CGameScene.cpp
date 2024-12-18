@@ -8,6 +8,7 @@
 #include "CGameMenu.h"
 #include "CBGMManager.h"
 #include "CLineEffect.h"
+#include "CCactus.h"
 
 //コンストラクタ
 CGameScene::CGameScene()
@@ -32,19 +33,27 @@ void CGameScene::Load()
 	//ここでゲーム中に必要な
 	//リソースの読み込みやクラスの生成を行う
 
-	CResourceManager::Load<CModel>("Field", "Field\\field.obj");
-	CResourceManager::Load<CModel>("FieldCube", "Field\\Object\\cube.obj");
-	CResourceManager::Load<CModel>("FieldCylinder", "Field\\Object\\cylinder.obj");
-	CResourceManager::Load<CModelX>("Player", "Character\\Player\\player.x");
-	CResourceManager::Load<CTexture>("Laser", "Effect\\laser.png");
-	CResourceManager::Load<CTexture>("LightningBolt", "Effect\\lightning_bolt.png");
-	CResourceManager::Load<CModel>("Slash", "Effect\\slash.obj");
-	CResourceManager::Load<CSound>("SlashSound", "Sound\\SE\\slash.wav");
+	CResourceManager::Load<CModel>(		"Field",			"Field\\field.obj");
+	CResourceManager::Load<CModel>(		"FieldCube",		"Field\\Object\\cube.obj");
+	CResourceManager::Load<CModel>(		"FieldCylinder",	"Field\\Object\\cylinder.obj");
+	CResourceManager::Load<CModelX>(	"Player",			"Character\\Player\\player.x");
+	CResourceManager::Load<CModelX>(	"Cactus",			"Character\\Enemy\\Cactus\\cactus.x");
+	CResourceManager::Load<CModel>(		"CactusNeedle",		"Character\\Enemy\\Cactus\\needle.obj");
+	CResourceManager::Load<CTexture>(	"Laser",			"Effect\\laser.png");
+	CResourceManager::Load<CTexture>(	"LightningBolt",	"Effect\\lightning_bolt.png");
+	CResourceManager::Load<CModel>(		"Slash",			"Effect\\slash.obj");
+	CResourceManager::Load<CSound>(		"SlashSound",		"Sound\\SE\\slash.wav");
+	CResourceManager::Load<CModel>(		"Sword",			"Weapon\\Sword\\sword.obj");
+	CResourceManager::Load<CModel>(		"Shield",			"Weapon\\Shield\\shield.obj");
 
 	// ゲームBGMを読み込み
 	CBGMManager::Instance()->Play(EBGMType::eGame);
 
 	new CField();
+
+	// サボテンの敵を作成
+	CCactus* cactus = new CCactus();
+	cactus->Position(0.0f, 0.0f, -100.0f);
 
 	CPlayer* player = new CPlayer();
 	player->Scale(1.0f, 1.0f, 1.0f);

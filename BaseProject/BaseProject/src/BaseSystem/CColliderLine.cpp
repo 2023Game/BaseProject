@@ -54,7 +54,11 @@ void CColliderLine::Render()
 
 	// DIFFUSEÔFÝ’è
 	CColor col = CColor::red;
-	if (!IsEnable()) col = CColor::gray;
+	if (!IsEnable() ||
+		(Owner() != nullptr && !Owner()->IsEnableCol()))
+	{
+		col = CColor::gray;
+	}
 	float* c = (float*)&col;
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, c);
 	glColor4fv(c);

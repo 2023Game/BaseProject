@@ -37,7 +37,7 @@ public:
 	/// ワールド位置を設定
 	/// </summary>
 	/// <param name="pos">ワールド位置</param>
-	void Position(const CVector& pos);
+	virtual void Position(const CVector& pos);
 	/// <summary>
 	/// ワールド位置を設定
 	/// </summary>
@@ -52,7 +52,7 @@ public:
 	/// ローカル位置を設定
 	/// </summary>
 	/// <param name="pos">ローカル位置</param>
-	void LocalPosition(const CVector& pos);
+	virtual void LocalPosition(const CVector& pos);
 	/// <summary>
 	/// ローカル位置を設定
 	/// </summary>
@@ -75,7 +75,7 @@ public:
 	/// ワールド回転値を設定
 	/// </summary>
 	/// <param name="rot">ワールド回転値（クォータニオン）</param>
-	void Rotation(const CQuaternion& rot);
+	virtual void Rotation(const CQuaternion& rot);
 	/// <summary>
 	/// ワールド回転値を設定
 	/// </summary>
@@ -93,7 +93,7 @@ public:
 	/// ローカル回転値を設定
 	/// </summary>
 	/// <param name="rot">ローカル回転値（クォータニオン）</param>
-	void LocalRotation(const CQuaternion& rot);
+	virtual void LocalRotation(const CQuaternion& rot);
 	/// <summary>
 	/// ローカル回転値を設定
 	/// </summary>
@@ -117,7 +117,7 @@ public:
 	/// ワールドスケール値を設定
 	/// </summary>
 	/// <param name="scale">ワールドスケール値</param>
-	void Scale(const CVector& scale);
+	virtual void Scale(const CVector& scale);
 	/// <summary>
 	/// ワールドスケール値を設定
 	/// </summary>
@@ -129,7 +129,7 @@ public:
 	/// ローカルスケール値を設定
 	/// </summary>
 	/// <param name="scale">ローカルスケール値</param>
-	void LocalScale(const CVector& scale);
+	virtual void LocalScale(const CVector& scale);
 	/// <summary>
 	/// ローカルスケール値を設定
 	/// </summary>

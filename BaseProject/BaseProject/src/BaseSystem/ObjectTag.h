@@ -17,6 +17,8 @@ enum class ETag
 	eFlame,	// ‰Š
 	eSlash,	// aŒ‚
 
+	eUI,
+
 	eCamera,// ƒJƒƒ‰
 
 	Num

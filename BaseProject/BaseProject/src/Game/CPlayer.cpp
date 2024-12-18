@@ -6,6 +6,34 @@
 #include "CFlamethrower.h"
 #include "CSlash.h"
 #include "Maths.h"
+#include "CSword.h"
+#include "CColliderCapsule.h"
+#include "CColliderSphere.h"
+
+// アニメーションのパス
+#define ANIM_PATH "Character\\Player\\anim\\"
+#define BODY_HEIGHT 16.0f	// 本体のコライダーの高さ
+#define BODY_RADIUS 3.0f	// 本体のコライダーの幅
+#define MOVE_SPEED 0.75f	// 移動速度
+#define JUMP_SPEED 1.5f		// ジャンプ速度
+#define GRAVITY 0.0625f		// 重力加速度
+
+#define MOTION_BLUR_TIME 3.0f	// モーションブラーを掛ける時間
+#define MOTION_BLUR_WIDTH 1.0f	// モーションブラーの幅
+#define MOTION_BLUR_COUNT 5		// モーションブラーの反復回数
+
+#define ATTACK_START_FRAME 26.0f	// 斬り攻撃の開始フレーム
+#define ATTACK_END_FRAME 50.0f		// 斬り攻撃の終了フレーム
+// 斬り攻撃の剣のオフセット座標
+#define ATTACK_SWORD_OFFSET_POS CVector(0.0f, 7.2f, 3.5f)
+// 斬り攻撃の剣のオフセット向き
+#define ATTACK_SWORD_OFFSET_ROT CVector(-20.0f, 0.0f, -7.0f)
+
+#define ATTACK2_START_FRAME 26.0f	// 蹴り攻撃の開始フレーム
+#define ATTACK2_END_FRAME 40.0f		// 蹴り攻撃の終了フレーム
+#define ATTACK2_COL_RADIUS 7.5f		// 蹴り攻撃のコライダーの半径
+// 蹴り攻撃のコライダーのオフセット座標
+#define ATTACK2_COL_OFFSET_POS CVector(0.0f, 4.0f, 5.0f)
 
 // プレイヤーのインスタンス
 CPlayer* CPlayer::spInstance = nullptr;
@@ -13,39 +41,34 @@ CPlayer* CPlayer::spInstance = nullptr;
 // プレイヤーのアニメーションデータのテーブル
 const CPlayer::AnimData CPlayer::ANIM_DATA[] =
 {
-	{ "",										true,	0.0f	},	// Tポーズ
-	{ "Character\\Player\\anim\\idle.x",		true,	153.0f	},	// 待機
-	{ "Character\\Player\\anim\\walk.x",		true,	66.0f	},	// 歩行
-	{ "Character\\Player\\anim\\attack.x",		false,	91.0f	},	// 攻撃
-	{ "Character\\Player\\anim\\jump_start.x",	false,	25.0f	},	// ジャンプ開始
-	{ "Character\\Player\\anim\\jump.x",		true,	1.0f	},	// ジャンプ中
-	{ "Character\\Player\\anim\\jump_end.x",	false,	26.0f	},	// ジャンプ終了
+	{ "",						true,	0.0f,	1.0f	},	// Tポーズ
+	{ ANIM_PATH"idle.x",		true,	153.0f,	1.0f	},	// 待機
+	{ ANIM_PATH"walk.x",		true,	66.0f,	1.0f	},	// 歩行
+	{ ANIM_PATH"attack.x",		false,	92.0f,	1.0f	},	// 斬り攻撃
+	{ ANIM_PATH"kick.x",		false,	74.0f,	1.0f	},	// 蹴り攻撃
+	{ ANIM_PATH"jump_start.x",	false,	25.0f,	1.0f	},	// ジャンプ開始
+	{ ANIM_PATH"jump.x",		true,	1.0f,	1.0f	},	// ジャンプ中
+	{ ANIM_PATH"jump_end.x",	false,	26.0f,	1.0f	},	// ジャンプ終了
+	{ ANIM_PATH"hit.x",			false,	44.0f,	1.0f	},	// 仰け反り
 };
-
-#define PLAYER_HEIGHT 16.0f
-#define MOVE_SPEED 0.375f * 2.0f
-#define JUMP_SPEED 1.5f
-#define GRAVITY 0.0625f
-#define JUMP_END_Y 1.0f
-
-// モーションブラーを掛ける時間
-#define MOTION_BLUR_TIME 3.0f
-// モーションブラーの幅
-#define MOTION_BLUR_WIDTH 1.0f
-// モーションブラーの反復回数
-#define MOTION_BLUR_COUNT 5
 
 // コンストラクタ
 CPlayer::CPlayer()
 	: CXCharacter(ETag::ePlayer, ETaskPriority::ePlayer)
 	, mState(EState::eIdle)
+	, mStateStep(0)
+	, mElapsedTime(0.0f)
 	, mMoveSpeedY(0.0f)
 	, mIsGrounded(false)
 	, mpRideObject(nullptr)
 	, mIsPlayedSlashSE(false)
 	, mIsSpawnedSlashEffect(false)
 	, mMotionBlurRemainTime(0.0f)
+	, mpSword(nullptr)
 {
+	mMaxHp = 100000;
+	mHp = mMaxHp;
+
 	//インスタンスの設定
 	spInstance = this;
 
@@ -66,13 +89,16 @@ CPlayer::CPlayer()
 	// 最初は待機アニメーションを再生
 	ChangeAnimation(EAnimType::eIdle);
 
-	mpColliderLine = new CColliderLine
+	// 本体のコライダーを作成
+	mpBodyCol = new CColliderCapsule
 	(
-		this, ELayer::eField,
-		CVector(0.0f, 0.0f, 0.0f),
-		CVector(0.0f, PLAYER_HEIGHT, 0.0f)
+		this, ELayer::ePlayer,
+		CVector(0.0f, BODY_RADIUS, 0.0f),
+		CVector(0.0f, BODY_HEIGHT - BODY_RADIUS, 0.0f),
+		BODY_RADIUS
 	);
-	mpColliderLine->SetCollisionLayers({ ELayer::eField });
+	mpBodyCol->SetCollisionTags({ ETag::eField, ETag::eRideableObject, ETag::eEnemy });
+	mpBodyCol->SetCollisionLayers({ ELayer::eField, ELayer::eEnemy, ELayer::eAttackCol });
 
 	mpSlashSE = CResourceManager::Get<CSound>("SlashSound");
 
@@ -82,14 +108,50 @@ CPlayer::CPlayer()
 		CVector(0.0f, 14.0f, -1.0f),
 		CQuaternion(0.0f, 90.0f, 0.0f).Matrix()
 	);
+
+	// プレイヤーの剣を作成
+	mpSword = new CSword
+	(
+		this,
+		ETag::ePlayer,
+		{ ETag::eEnemy },	// 敵のタグが設定されたコライダーと衝突
+		{ ELayer::eEnemy }	// 敵のレイヤーが設定されたコライダーと衝突
+	);
+
+	// 右手のフレームを取得し、
+	// 剣にプレイヤーの右手の行列をアタッチ
+	CModelXFrame* frame = mpModel->FinedFrame("Armature_mixamorig_RightHand");
+	mpSword->SetAttachMtx(&frame->CombinedMatrix());
+	mpSword->Position(ATTACK_SWORD_OFFSET_POS);
+	mpSword->Rotation(ATTACK_SWORD_OFFSET_ROT);
+
+	// 蹴り攻撃用のコライダーを作成
+	mpAttack2Col = new CColliderSphere
+	(
+		this, ELayer::eAttackCol,
+		ATTACK2_COL_RADIUS
+	);
+	// 敵の本体のコライダーとのみヒットするように設定
+	mpAttack2Col->SetCollisionTags({ ETag::eEnemy });
+	mpAttack2Col->SetCollisionLayers({ ELayer::eEnemy });
+	// プレイヤーの正面にズラす
+	mpAttack2Col->Position(ATTACK2_COL_OFFSET_POS);
+	// 攻撃コライダーは最初はオフにしておく
+	mpAttack2Col->SetEnable(false);
 }
 
 CPlayer::~CPlayer()
 {
-	if (mpColliderLine != nullptr)
+	// コライダーを削除
+	SAFE_DELETE(mpBodyCol);
+	SAFE_DELETE(mpAttack2Col);
+
+	// 剣が存在したら、
+	if (mpSword != nullptr)
 	{
-		delete mpColliderLine;
-		mpColliderLine = nullptr;
+		// 持ち主を解除してから、削除
+		mpSword->SetOwner(nullptr);
+		mpSword->Kill();
 	}
 }
 
@@ -106,75 +168,129 @@ void CPlayer::ChangeAnimation(EAnimType type, bool restart)
 	CXCharacter::ChangeAnimation((int)type, data.loop, data.frameLength, restart);
 }
 
+// 状態を切り替え
+void CPlayer::ChangeState(EState state)
+{
+	if (mState == state) return;
+
+	// 攻撃中に他に状態に変わる時は、
+	// 攻撃終了処理を呼び出しておく
+	if (IsAttacking())
+	{
+		AttackEnd();
+	}
+
+	mState = state;
+	mStateStep = 0;
+	mElapsedTime = 0.0f;
+}
+
 // 待機
 void CPlayer::UpdateIdle()
 {
 	// 接地していれば、
 	if (mIsGrounded)
 	{
-		// 左クリックで攻撃状態へ移行
+		// 左クリックで斬撃攻撃へ移行
 		if (CInput::PushKey(VK_LBUTTON))
 		{
 			mMoveSpeed = CVector::zero;
-			mState = EState::eAttack;
+			ChangeState(EState::eAttack1);
+		}
+		// 右クリックでキック攻撃へ以降
+		else if (CInput::PushKey(VK_RBUTTON))
+		{
+			mMoveSpeed = CVector::zero;
+			ChangeState(EState::eAttack2);
 		}
 		// SPACEキーでジャンプ開始へ移行
 		else if (CInput::PushKey(VK_SPACE))
 		{
-			mState = EState::eJumpStart;
+			ChangeState(EState::eJumpStart);
 		}
 	}
 }
 
-// 攻撃
-void CPlayer::UpdateAttack()
+// 斬り攻撃
+void CPlayer::UpdateAttack1()
 {
-	// 攻撃アニメーションを開始
-	ChangeAnimation(EAnimType::eAttack, true);
-	// 攻撃終了待ち状態へ移行
-	mState = EState::eAttackWait;
+	switch (mStateStep)
+	{
+		case 0:
+			// 攻撃アニメーションを開始
+			ChangeAnimation(EAnimType::eAttack, true);
+			// 斬撃SEの再生済みフラグを初期化
+			mIsPlayedSlashSE = false;
+			// 斬撃エフェクトの生成済みフラグを初期化
+			mIsSpawnedSlashEffect = false;
 
-	// 斬撃SEの再生済みフラグを初期化
-	mIsPlayedSlashSE = false;
-	// 斬撃エフェクトの生成済みフラグを初期化
-	mIsSpawnedSlashEffect = false;
+			mStateStep++;
+			break;
+		case 1:
+			if (GetAnimationFrame() >= ATTACK_START_FRAME)
+			{
+				// 斬撃SEを再生
+				mpSlashSE->Play();
+				// 攻撃開始
+				AttackStart();
+
+				mStateStep++;
+			}
+			break;
+		case 2:
+			if (GetAnimationFrame() >= ATTACK_END_FRAME)
+			{
+				// 攻撃終了
+				AttackEnd();
+
+				mStateStep++;
+			}
+			break;
+		case 3:
+			// 攻撃アニメーションが終了したら、
+			if (IsAnimationFinished())
+			{
+				// 待機状態へ移行
+				ChangeState(EState::eIdle);
+				ChangeAnimation(EAnimType::eIdle);
+			}
+			break;
+	}
 }
 
-// 攻撃終了待ち
-void CPlayer::UpdateAttackWait()
+// 蹴り攻撃
+void CPlayer::UpdateAttack2()
 {
-	// 斬撃SEを再生していないかつ、アニメーションが25%以上進行したら、
-	if (!mIsPlayedSlashSE && GetAnimationFrameRatio() >= 0.25f)
+	switch (mStateStep)
 	{
-		// 斬撃SEを再生
-		mpSlashSE->Play();
-		mIsPlayedSlashSE = true;
-	}
-
-	// 斬撃エフェクトを生成していないかつ、アニメーションが35%以上進行したら、
-	if (!mIsSpawnedSlashEffect && GetAnimationFrameRatio() >= 0.35f)
-	{
-		// 斬撃エフェクトを生成して、正面方向へ飛ばす
-		CSlash* slash = new CSlash
-		(
-			this,
-			Position() + CVector(0.0f, 10.0f, 0.0f),
-			VectorZ(),
-			300.0f,
-			100.0f
-		);
-		// 斬撃エフェクトの色設定
-		slash->SetColor(CColor(0.15f, 0.5f, 0.5f));
-
-		mIsSpawnedSlashEffect = true;
-	}
-
-	// 攻撃アニメーションが終了したら、
-	if (IsAnimationFinished())
-	{
-		// 待機状態へ移行
-		mState = EState::eIdle;
-		ChangeAnimation(EAnimType::eIdle);
+		case 0:
+			// 攻撃アニメーションを開始
+			ChangeAnimation(EAnimType::eKick, true);
+			mStateStep++;
+			break;
+		case 1:
+			if (GetAnimationFrame() >= ATTACK2_START_FRAME)
+			{
+				AttackStart();
+				mStateStep++;
+			}
+			break;
+		case 2:
+			if (GetAnimationFrame() >= ATTACK2_END_FRAME)
+			{
+				AttackEnd();
+				mStateStep++;
+			}
+			break;
+		case 3:
+			// 攻撃アニメーションが終了したら、
+			if (IsAnimationFinished())
+			{
+				// 待機状態へ移行
+				ChangeState(EState::eIdle);
+				ChangeAnimation(EAnimType::eIdle);
+			}
+			break;
 	}
 }
 
@@ -182,7 +298,7 @@ void CPlayer::UpdateAttackWait()
 void CPlayer::UpdateJumpStart()
 {
 	ChangeAnimation(EAnimType::eJumpStart);
-	mState = EState::eJump;
+	ChangeState(EState::eJump);
 
 	mMoveSpeedY += JUMP_SPEED;
 	mIsGrounded = false;
@@ -194,7 +310,7 @@ void CPlayer::UpdateJump()
 	if (mMoveSpeedY <= 0.0f)
 	{
 		ChangeAnimation(EAnimType::eJumpEnd);
-		mState = EState::eJumpEnd;
+		ChangeState(EState::eJumpEnd);
 	}
 }
 
@@ -205,7 +321,39 @@ void CPlayer::UpdateJumpEnd()
 	// 地面に接地したら、待機状態へ戻す
 	if (IsAnimationFinished() && mIsGrounded)
 	{
-		mState = EState::eIdle;
+		ChangeState(EState::eIdle);
+	}
+}
+
+// 仰け反り
+void CPlayer::UpdateHit()
+{
+	switch (mStateStep)
+	{
+		case 0:
+			// 仰け反りアニメーションを開始
+			ChangeAnimation(EAnimType::eHit, true);
+			mStateStep++;
+			break;
+		case 1:
+			// 仰け反りアニメーションが終了したら
+			if (IsAnimationFinished())
+			{
+				// 待機状態へ移行
+				ChangeState(EState::eIdle);
+				ChangeAnimation(EAnimType::eIdle);
+			}
+			break;
+	}
+}
+
+// オブジェクト削除を伝える
+void CPlayer::DeleteObject(CObjectBase* obj)
+{
+	// 剣が先に削除されたら、剣のポインタを初期化
+	if (mpSword == obj)
+	{
+		mpSword = nullptr;
 	}
 }
 
@@ -319,29 +467,19 @@ void CPlayer::Update()
 	switch (mState)
 	{
 		// 待機状態
-		case EState::eIdle:
-			UpdateIdle();
-			break;
-		// 攻撃
-		case EState::eAttack:
-			UpdateAttack();
-			break;
-		// 攻撃終了待ち
-		case EState::eAttackWait:
-			UpdateAttackWait();
-			break;
+		case EState::eIdle:			UpdateIdle();		break;
+		// 斬り攻撃
+		case EState::eAttack1:		UpdateAttack1();	break;
+		// 蹴り攻撃
+		case EState::eAttack2:		UpdateAttack2();	break;
 		// ジャンプ開始
-		case EState::eJumpStart:
-			UpdateJumpStart();
-			break;
+		case EState::eJumpStart:	UpdateJumpStart();	break;
 		// ジャンプ中
-		case EState::eJump:
-			UpdateJump();
-			break;
+		case EState::eJump:			UpdateJump();		break;
 		// ジャンプ終了
-		case EState::eJumpEnd:
-			UpdateJumpEnd();
-			break;
+		case EState::eJumpEnd:		UpdateJumpEnd();	break;
+		// 仰け反り
+		case EState::eHit:			UpdateHit();		break;
 	}
 
 	// 待機中とジャンプ中は、移動処理を行う
@@ -367,8 +505,8 @@ void CPlayer::Update()
 	CVector forward = CVector::Slerp(current, target, 0.125f);
 	Rotation(CQuaternion::LookRotation(forward));
 
-	// 右クリックで弾丸発射
-	if (CInput::PushKey(VK_RBUTTON))
+	// ホイールクリックで弾丸発射
+	if (CInput::PushKey(VK_MBUTTON))
 	{
 		// 弾丸を生成
 		new CBullet
@@ -418,19 +556,91 @@ void CPlayer::Update()
 	// キャラクターの更新
 	CXCharacter::Update();
 
-	CDebugPrint::Print("Grounded:%s\n", mIsGrounded ? "true" : "false");
-	CDebugPrint::Print("State:%d\n", mState);
+	// 武器の行列を更新
+	mpSword->UpdateMtx();
+
+	CVector pos = Position();
+	CDebugPrint::Print("PlayerHP:%d / %d\n", mHp, mMaxHp);
+	CDebugPrint::Print("PlayerPos:%.2f, %.2f, %.2f\n", pos.X(), pos.Y(), pos.Z());
+	CDebugPrint::Print("PlayerGrounded:%s\n", mIsGrounded ? "true" : "false");
+	CDebugPrint::Print("PlayerState:%d\n", mState);
 
 	mIsGrounded = false;
 
 	CDebugPrint::Print("FPS:%f\n", Times::FPS());
 }
 
+// 攻撃中か
+bool CPlayer::IsAttacking() const
+{
+	// 斬り攻撃中
+	if (mState == EState::eAttack1) return true;
+	// 蹴り攻撃中
+	if (mState == EState::eAttack2) return true;
+
+	// 攻撃中でない
+	return false;
+}
+
+// 攻撃開始
+void CPlayer::AttackStart()
+{
+	// ベースクラスの攻撃開始処理を呼び出し
+	CXCharacter::AttackStart();
+
+	// 斬り攻撃中であれば、剣のコライダーをオンにする
+	if (mState == EState::eAttack1)
+	{
+		mpSword->SetEnableCol(true);
+	}
+	// 蹴り攻撃中であれば、蹴り攻撃用のコライダーをオンにする
+	else if (mState == EState::eAttack2)
+	{
+		mpAttack2Col->SetEnable(true);
+	}
+}
+
+// 攻撃終了
+void CPlayer::AttackEnd()
+{
+	// ベースクラスの攻撃終了処理を呼び出し
+	CXCharacter::AttackEnd();
+
+	// 攻撃コライダーをオフ
+	mpSword->SetEnableCol(false);
+	mpAttack2Col->SetEnable(false);
+}
+
+// ダメージを受ける
+void CPlayer::TakeDamage(int damage, CObjectBase* causer)
+{
+	// ベースクラスのダメージ処理を呼び出す
+	CXCharacter::TakeDamage(damage, causer);
+
+	// 死亡していなければ、
+	if (!IsDeath())
+	{
+		// 仰け反り状態へ移行
+		ChangeState(EState::eHit);
+
+		// 攻撃を加えた相手の方向へ向く
+		CVector targetPos = causer->Position();
+		CVector vec = targetPos - Position();
+		vec.Y(0.0f);
+		Rotation(CQuaternion::LookRotation(vec.Normalized()));
+
+		// 移動を停止
+		mMoveSpeed = CVector::zero;
+	}
+}
+
 // 衝突処理
 void CPlayer::Collision(CCollider* self, CCollider* other, const CHitInfo& hit)
 {
-	if (self == mpColliderLine)
+	// 本体のコライダーの衝突判定
+	if (self == mpBodyCol)
 	{
+		// フィールドとの衝突
 		if (other->Layer() == ELayer::eField)
 		{
 			// 坂道で滑らないように、押し戻しベクトルのXとZの値を0にする
@@ -473,6 +683,35 @@ void CPlayer::Collision(CCollider* self, CCollider* other, const CHitInfo& hit)
 					mMoveSpeedY = 0.0f;
 				}
 			}
+		}
+		// 敵と衝突した場合
+		else if (other->Layer() == ELayer::eEnemy)
+		{
+			// 横方向にのみ押し戻すため、
+			// 押し戻しベクトルのYの値を0にする
+			CVector adjust = hit.adjust;
+			adjust.Y(0.0f);
+			Position(Position() + adjust * hit.weight);
+		}
+	}
+	// 剣のコライダーが衝突した
+	else if (self == mpSword->Collider())
+	{
+		CCharaBase* hitChara = dynamic_cast<CCharaBase*>(other->Owner());
+		if (hitChara != nullptr && !IsAttackHitObj(hitChara))
+		{
+			AddAttackHitObj(hitChara);
+			hitChara->TakeDamage(1, this);
+		}
+	}
+	// 蹴り攻撃のコライダーが衝突した
+	else if (self == mpAttack2Col)
+	{
+		CCharaBase* hitChara = dynamic_cast<CCharaBase*>(other->Owner());
+		if (hitChara != nullptr && !IsAttackHitObj(hitChara))
+		{
+			AddAttackHitObj(hitChara);
+			hitChara->TakeDamage(1, this);
 		}
 	}
 }

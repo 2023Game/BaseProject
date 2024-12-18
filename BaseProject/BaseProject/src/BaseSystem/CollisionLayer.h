@@ -8,6 +8,7 @@ enum class ELayer
 	eTest,
 	eField,
 	ePlayer,
+	eEnemy,
 
 	eAttackCol,
 };

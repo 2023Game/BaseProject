@@ -166,7 +166,7 @@ bool CCollider::IsCollisionTag(ETag tag) const
 	return (mCollisionTags & 1 << (int)tag) != 0;
 }
 
-// 指定した行列にコライダーを附属させる
+// 指定した行列にコライダーをくっつける
 void CCollider::SetAttachMtx(const CMatrix* mtx)
 {
 	mpAttachMtx = mtx;
@@ -176,19 +176,17 @@ void CCollider::SetAttachMtx(const CMatrix* mtx)
 CMatrix CCollider::Matrix() const
 {
 	CMatrix m = CTransform::Matrix();
-	// 附属させる行列が設定されていれば
+	// くっつける行列が設定されていれば
 	if (mpAttachMtx != nullptr)
 	{
-		// その行列に附属する
-		CMatrix sm;
-		sm.Scale(100.0f, 100.0f, 100.0f);
-		m = sm * mAttachMtx * m;
+		// その行列にくっつける
+		m = m * mAttachMtx;
 	}
 	// 持ち主が設定されていれば
 	else if (mpOwner != nullptr)
 	{
 		// 持ち主の行列に附属
-		m = mpOwner->Matrix() * m;
+		m = m * mpOwner->Matrix();
 	}
 	return m;
 }

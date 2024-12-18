@@ -44,7 +44,11 @@ void CColliderSphere::Render()
 
 	// DIFFUSEÔFÝ’è
 	CColor col = CColor::red;
-	if (!IsEnable()) col = CColor::gray;
+	if (!IsEnable() ||
+		(Owner() != nullptr && !Owner()->IsEnableCol()))
+	{
+		col = CColor::gray;
+	}
 	col.A(0.2f);
 	float* c = (float*)&col;
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, c);
