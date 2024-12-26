@@ -68,13 +68,14 @@ void CCollisionTestScene::Load()
 	);
 	mColList.push_back(cc);
 
-	CColLine* cl2 = new CColLine
+	CColCapsule* cc2 = new CColCapsule
 	(
-		CVector(-10.0f, 15.0f, -5.0f),
-		CVector(-10.0f, 11.0f, 5.0f),
+		CVector(-10.0f, 15.0f, 2.0f),
+		CVector(-10.0f, 6.0f, -1.0f),
+		5.0f,
 		CColor::gray
 	);
-	mColList.push_back(cl2);
+	mColList.push_back(cc2);
 
 	//mpColTriangle = new CColTriangle
 	//(

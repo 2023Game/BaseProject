@@ -610,55 +610,68 @@ bool CCollider::CollisionCapsuleLine(
 	const CVector& ls, const CVector& le,
 	CHitInfo* hit, bool isLeftMain)
 {
-	//TODO:調整値の対応
 	hit->adjust = CVector(0.0f, 0.0f, 0.0f);
 
-	CVector V0 = le - ls;
-	CVector V1 = ce - cs;
+	CVector SE0 = ce - cs;
+	CVector SE1 = le - ls;
+	CVector S10 = cs - ls;
 
-	CVector S1E1 = le - ls;
-	CVector S2E2 = ce - cs;
-	CVector CD = CVector::Cross(V0, V1).Normalized();
+	float L0 = SE0.LengthSqr();
+	float L1 = SE1.LengthSqr();
+	float d0 = CVector::Dot(SE0, S10);
+	float d1 = CVector::Dot(SE1, S10);
 
-	CVector S1S2 = cs - ls;
-	CVector S1E2 = ce - ls;
-	CVector S2S1 = ls - cs;
-	CVector S2E1 = le - cs;
-
-	float length = 0.0f;
-	float d1 = S1E1.Cross(S1S2).Dot(S1E1.Cross(S1E2));
-	float d2 = S2E2.Cross(S2S1).Dot(S2E2.Cross(S2E1));
-	if (d1 < 0 && d2 < 0)
+	float t0, t1;
+	if (L0 <= EPSILON && L1 <= EPSILON)
 	{
-		length = abs(S1S2.Dot(CD));
+		t0 = 0.0f;
+		t1 = 0.0f;
+	}
+	else if (L0 <= EPSILON)
+	{
+		t0 = 0.0f;
+		t1 = Math::Clamp01(d1 / L1);
+	}
+	else if (L1 <= EPSILON)
+	{
+		t0 = Math::Clamp01(-d0 / L0);
+		t1 = 0.0f;
 	}
 	else
 	{
-		float length1 = CalcDistancePointToLine(ls, cs, ce);
-		float length2 = CalcDistancePointToLine(le, cs, ce);
-		float length3 = CalcDistancePointToLine(cs, ls, le);
-		float length4 = CalcDistancePointToLine(ce, ls, le);
-		length = fminf(fminf(length1, length2), fminf(length3, length4));
+		float d01 = CVector::Dot(SE0, SE1);
+		float dn = L0 * L1 - d01 * d01;
+
+		t0 = 0.0f;
+		if (dn != 0.0f)
+		{
+			t0 = Math::Clamp01((d01 * d1 - d0 * L1) / dn);
+		}
+
+		t1 = (d01 * t0 + d1) / L1;
+
+		if (t1 < 0.0f)
+		{
+			t1 = 0.0f;
+			t0 = Math::Clamp01(-d0 / L0);
+		}
+		else if (t1 > 1.0f)
+		{
+			t1 = 1.0f;
+			t0 = Math::Clamp01((d01 - d0) / L0);
+		}
 	}
 
-	if (length < cr)
-	{
-		CVector n = CVector::zero;
-		if (CD.LengthSqr() == 0.0f)
-		{
-			n = CVector::Cross(V0, CVector::forward);
-			if (n.LengthSqr() == 0.0f)
-			{
-				n = CVector::Cross(V0, CVector::up);
-			}
-		}
-		else
-		{
-			n = CD;
-		}
+	CVector C1 = cs + SE0 * t0;
+	CVector C2 = ls + SE1 * t1;
 
-		n = (n.Normalized() * S1S2.Dot(n)).Normalized();
-		hit->adjust = n * (cr - length);
+	float dist = CVector::Distance(C1, C2);
+	if (dist < cr)
+	{
+		CVector n = (C1 - C2).Normalized();
+		float length = cr - dist;
+		hit->adjust = n * length;
+
 		return true;
 	}
 
@@ -670,78 +683,79 @@ bool CCollider::CollisionCapsule(const CVector& cs0, const CVector& ce0, float c
 {
 	hit->adjust = CVector(0.0f, 0.0f, 0.0f);
 
-	CVector V0 = ce0 - cs0;
-	CVector V1 = ce1 - cs1;
-	CVector VN0 = V0.Normalized();
-	CVector VN1 = V1.Normalized();
+	CVector SE0 = ce0 - cs0;
+	CVector SE1 = ce1 - cs1;
+	CVector S10 = cs0 - cs1;
 
-	CVector S1E1 = ce0 - cs0;
-	CVector S2E2 = ce1 - cs1;
-	CVector CD = CVector::Cross(V0, V1).Normalized();
+	float L0 = SE0.LengthSqr();
+	float L1 = SE1.LengthSqr();
+	float d0 = CVector::Dot(SE0, S10);
+	float d1 = CVector::Dot(SE1, S10);
 
-	CVector S1S2 = cs1 - cs0;
-	CVector S1E2 = ce1 - cs0;
-	CVector S2S1 = cs0 - cs1;
-	CVector S2E1 = ce0 - cs1;
-
-	CVector cross = CVector::zero;
-
-	float length = 0.0f;
-	float d1 = S1E1.Cross(S1S2).Dot(S1E1.Cross(S1E2));
-	float d2 = S2E2.Cross(S2S1).Dot(S2E2.Cross(S2E1));
-	if (d1 < 0 && d2 < 0)
+	// 最近点までの距離を求める
+	float t0, t1;
+	// 両カプセルが点だった場合
+	if (L0 <= EPSILON && L1 <= EPSILON)
 	{
-		length = abs(S1S2.Dot(CD));
-		float d = CVector::Dot(VN0, VN1);
-		float dn0 = CVector::Dot(S1S2, VN0);
-		float dn1 = CVector::Dot(S1S2, VN1);
-		float r = 1.0f - d * d;
-		if (r != 0.0f)
-		{
-			float t1 = (dn0 - d * dn1) / r;
-			float t2 = (d * dn0 - dn1) / r;
-			CVector p1 = cs0 + VN0 * t1;
-			CVector p2 = cs1 + VN1 * t2;
-			cross = (p1 + p2) * 0.5f;
-		}
+		t0 = 0.0f;
+		t1 = 0.0f;
 	}
+	// カプセル1が点だった場合
+	else if (L0 <= EPSILON)
+	{
+		t0 = 0.0f;
+		t1 = Math::Clamp01(d1 / L1);
+	}
+	// カプセル2が点だった場合
+	else if (L1 <= EPSILON)
+	{
+		t0 = Math::Clamp01(-d0 / L0);
+		t1 = 0.0f;
+	}
+	// 両方ともカプセルだった場合
 	else
 	{
-		CVector n1, n2, n3, n4;
-		float length1 = CalcDistancePointToLine(cs0, cs1, ce1, &n1);
-		float length2 = CalcDistancePointToLine(ce0, cs1, ce1, &n2);
-		float length3 = CalcDistancePointToLine(cs1, cs0, ce0, &n3);
-		float length4 = CalcDistancePointToLine(ce1, cs0, ce0, &n4);
-		length = fminf(fminf(length1, length2), fminf(length3, length4));
+		float d01 = CVector::Dot(SE0, SE1);
+		float dn = L0 * L1 - d01 * d01;
 
-		if (length == length1) cross = (cs0 + n1) * 0.5f;
-		else if (length == length2) cross = (ce0 + n2) * 0.5f;
-		else if (length == length3) cross = (cs1 + n3) * 0.5f;
-		else cross = (ce1 + n4) * 0.5f;
+		t0 = 0.0f;
+		if (dn != 0.0f)
+		{
+			t0 = Math::Clamp01((d01 * d1 - d0 * L1) / dn);
+		}
+
+		t1 = (d01 * t0 + d1) / L1;
+
+		if (t1 < 0.0f)
+		{
+			t1 = 0.0f;
+			t0 = Math::Clamp01(-d0 / L0);
+		}
+		else if (t1 > 1.0f)
+		{
+			t1 = 1.0f;
+			t0 = Math::Clamp01((d01 - d0) / L0);
+		}
 	}
 
-	if (length < cr0 + cr1)
-	{
-		CVector n = CVector::zero;
-		if (CD.LengthSqr() == 0.0f)
-		{
-			n = CVector::Cross(V0, CVector::forward);
-			if (n.LengthSqr() == 0.0f)
-			{
-				n = CVector::Cross(V0, CVector::up);
-			}
-		}
-		else
-		{
-			n = CD;
-		}
+	// 最近点を求める
+	CVector C1 = cs0 + SE0 * t0;
+	CVector C2 = cs1 + SE1 * t1;
 
-		n = -(n.Normalized() * S1S2.Dot(n)).Normalized();
-		hit->adjust = n * ((cr0 + cr1) - length);
-		hit->cross = cross;
+	// 最短距離を求め、両カプセルの半径の合計値より
+	// 小さい場合は衝突している
+	float dist = CVector::Distance(C1, C2);
+	if (dist < cr0 + cr1)
+	{
+		// 求めた最近点の方向へ押し戻す
+		CVector n = (C1 - C2).Normalized();
+		float length = cr0 + cr1 - dist;
+		hit->adjust = n * length;
+
 		return true;
 	}
 
+	// 衝突しなかった
 	return false;
 }
 
