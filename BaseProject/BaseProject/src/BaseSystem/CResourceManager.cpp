@@ -103,8 +103,9 @@ void CResourceManager::Delete(std::string name)
 	auto find = list.find(name);
 	if (find == list.end()) return;
 
+	CResource* res = find->second;
 	list.erase(find);
-	delete find->second;
+	delete res;
 }
 
 // 指定したシーンに所属するリソースを全て削除
