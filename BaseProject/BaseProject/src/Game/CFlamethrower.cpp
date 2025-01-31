@@ -17,11 +17,24 @@ CFlamethrower::CFlamethrower(CObjectBase* owner, const CMatrix* attach,
 	const CVector& offsetPos, const CMatrix& offsetRot)
 	: mpOwner(owner)
 	, mpAttachMtx(attach)
+	, mThrowDir(CVector::zero)
 	, mThrowOffsetPos(offsetPos)
 	, mThrowOffsetRot(offsetRot)
 	, mElapsedTime(0.0f)
 	, mIsThrowing(false)
+	, mFlameColor(FLAME_COLOR)
+	, mIsAddBlend(true)
+	, mFlameScale(FLAME_SCALE)
+	, mFlameScaleAnimTime(FLAME_SCALE_ANIM_TIME)
+	, mFlameMoveSpeed(FLAME_MOVE_SPEED)
 {
+
+}
+
+CFlamethrower::CFlamethrower(CObjectBase* owner, const CMatrix* attach, const CVector& offsetPos, const CVector& throwDir)
+	: CFlamethrower(owner, attach, offsetPos)
+{
+	SetThrowDir(throwDir);
 }
 
 // デストラクタ
@@ -52,6 +65,12 @@ bool CFlamethrower::IsThrowing() const
 	return mIsThrowing;
 }
 
+// 発射方向を設定
+void CFlamethrower::SetThrowDir(const CVector& dir)
+{
+	mThrowDir = dir.Normalized();
+}
+
 // 発射時のオフセット位置を設定
 void CFlamethrower::SetThrowOffsetPos(const CVector& pos)
 {
@@ -62,6 +81,36 @@ void CFlamethrower::SetThrowOffsetPos(const CVector& pos)
 void CFlamethrower::SetThrowOffsetRot(const CMatrix& rot)
 {
 	mThrowOffsetRot = rot;
+}
+
+// 炎の色を設定
+void CFlamethrower::SetFlameColor(CColor color)
+{
+	mFlameColor = color;
+}
+
+// 加算ブレンドを使用するかを設定
+void CFlamethrower::SetAddBlend(bool use)
+{
+	mIsAddBlend = use;
+}
+
+// 炎のスケールの最大値を設定
+void CFlamethrower::SetFlameScale(float flameScale)
+{
+	mFlameScale = flameScale;
+}
+
+// 炎のスケール値が最大値になるまでの時間を設定
+void CFlamethrower::SetFlameScaleAnimTime(float flameScaleAnimTime)
+{
+	mFlameScaleAnimTime = flameScaleAnimTime;
+}
+
+// 炎の移動速度を設定
+void CFlamethrower::SetFlameMoveSpeed(float flameMoveSpeed)
+{
+	mFlameMoveSpeed = flameMoveSpeed;
 }
 
 // 炎の発射位置を取得
@@ -88,6 +137,12 @@ CVector CFlamethrower::GetThrowPos() const
 // 炎の発射方向を取得
 CVector CFlamethrower::GetThrowDir() const
 {
+	// 発射方向ベクトルが設定されていたら、そちらを優先する
+	if (mThrowDir.LengthSqr() > 0.0f)
+	{
+		return mThrowDir;
+	}
+
 	// アタッチする行列が設定されている場合は、行列の正面方向ベクトルを返す
 	if (mpAttachMtx != nullptr)
 	{
@@ -118,12 +173,19 @@ void CFlamethrower::CreateFlame()
 	dir.Z(dir.Z() + Math::Rand(-FLAME_DIR_RAND, FLAME_DIR_RAND));
 	dir.Normalize();
 	// 発射位置、方向、移動速度を設定
-	flame->Setup(pos, dir, FLAME_MOVE_SPEED);
+	flame->Setup(pos, dir, mFlameMoveSpeed);
 
 	// 炎のカラーを設定
-	flame->SetColor(FLAME_COLOR);
-	// 加算ブレンドにして、炎が発光しているように見せる
-	flame->SetBlendType(EBlend::eAdd);
+	flame->SetColor(mFlameColor);
+	if (mIsAddBlend)
+	{
+		// 加算ブレンドにして、炎が発光しているように見せる
+		flame->SetBlendType(EBlend::eAdd);
+	}
+	// 炎のスケール値の最大値を設定
+	flame->SetFlameScale(mFlameScale);
+	// 炎のスケール値が最大値になるまでの時間を設定
+	flame->SetFlameScaleAnimTime(mFlameScaleAnimTime);
 
 	// 作成した炎のエフェクトをリストに追加
 	mFlames.push_back(flame);

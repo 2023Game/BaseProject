@@ -16,6 +16,13 @@ public:
 	/// <param name="第2引数以降">文字列に変換する引数</param>
 	static void Print(const char* format, ...);
 
+	/// <summary>
+	/// 描画するデバッグ文字列を追加（強制表示用）
+	/// </summary>
+	/// <param name="format">書式文字列</param>
+	/// <param name="第2引数以降">文字列に変換する引数</param>
+	static void ForcePrint(const char* format, ...);
+
 private:
 	// コンストラクタ
 	CDebugPrint();
@@ -29,6 +36,7 @@ private:
 	void Render();
 
 	static CDebugPrint* mspInstance;		// インスタンス
+	bool mIsOn;		// デバッグプリントが有効かどうか
 	std::vector<std::string> mPrintStrList;	// 描画文字列のリスト
 	CText* mpText;	// 文字列描画用
 };

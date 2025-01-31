@@ -1,11 +1,6 @@
 #include "CFlame.h"
 #include "Easing.h"
 
-// 炎のスケール値の最大値
-#define FLAME_SCALE 10.0f
-// 炎のスケール値が最大値になるまでの時間
-#define FLAME_SCALE_ANIM_TIME 3.0f
-
 // アニメーションの1コマ表示時間
 #define ANIM_TIME 0.0625f
 // 炎のエフェクトのアニメーションデータ
@@ -17,6 +12,8 @@ CFlame::CFlame(ETag tag)
 	, mMoveSpeed(CVector::zero)
 	, mElapsedTime(0.0f)
 	, mIsDeath(false)
+	, mFlameScale(FLAME_SCALE)
+	, mFlameScaleAnimTime(FLAME_SCALE_ANIM_TIME)
 {
 	SetAnimData(&msAnimData);
 
@@ -27,7 +24,7 @@ CFlame::CFlame(ETag tag)
 		1.0f
 	);
 	mpCollider->SetCollisionTags({ ETag::eField, ETag::eRideableObject });
-	mpCollider->SetCollisionLayers({ ELayer::eField });
+	mpCollider->SetCollisionLayers({ ELayer::eGround });
 }
 
 // デストラクタ
@@ -65,10 +62,22 @@ void CFlame::SetBlendType(EBlend type)
 	mMaterial.SetBlendType(type);
 }
 
+// 炎のスケールの最大値を設定
+void CFlame::SetFlameScale(float flameScale)
+{
+	mFlameScale = flameScale;
+}
+
+// 炎のスケール値が最大値になるまでの時間を設定
+void CFlame::SetFlameScaleAnimTime(float flameScaleAnimTime)
+{
+	mFlameScaleAnimTime = flameScaleAnimTime;
+}
+
 // 衝突処理
 void CFlame::Collision(CCollider* self, CCollider* other, const CHitInfo& hit)
 {
-	if (other->Layer() == ELayer::eField)
+	if (other->Layer() == ELayer::eGround)
 	{
 		float length = mMoveSpeed.Length();
 		CVector n = hit.adjust.Normalized();
@@ -89,18 +98,18 @@ void CFlame::Update()
 	Position(Position() + move);
 
 	// スケール変更時間を経過していない
-	if (mElapsedTime < FLAME_SCALE_ANIM_TIME)
+	if (mElapsedTime < mFlameScaleAnimTime)
 	{
 		// 経過時間に合わせて、徐々に炎を大きくする
-		float per = mElapsedTime / FLAME_SCALE_ANIM_TIME;
+		float per = mElapsedTime / mFlameScaleAnimTime;
 		if (per < 1.0f)
 		{
 			float scale = Easing::QuadOut(per, 1.0f, 0.0f, 1.0f);
-			Scale(CVector::one * scale * FLAME_SCALE);
+			Scale(CVector::one * scale * mFlameScale);
 		}
 		else
 		{
-			Scale(CVector::one * FLAME_SCALE);
+			Scale(CVector::one * mFlameScale);
 		}
 
 		mElapsedTime += Times::DeltaTime();
@@ -108,7 +117,7 @@ void CFlame::Update()
 	// 移動時間が経過したら、削除する
 	else
 	{
-		Scale(CVector::one * FLAME_SCALE);
+		Scale(CVector::one * mFlameScale);
 	}
 
 	// アニメーションが終わったら、削除フラグを立てる

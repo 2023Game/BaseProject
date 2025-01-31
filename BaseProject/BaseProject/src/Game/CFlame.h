@@ -2,6 +2,11 @@
 #include "CBillBoardImage.h"
 #include "CColliderSphere.h"
 
+// 炎のスケール値の最大値
+#define FLAME_SCALE 10.0f
+// 炎のスケール値が最大値になるまでの時間
+#define FLAME_SCALE_ANIM_TIME 3.0f
+
 // 炎のエフェクト
 class CFlame : public CBillBoardImage
 {
@@ -23,6 +28,10 @@ public:
 	void SetColor(const CColor& color) override;
 	// ブレンドタイプを設定
 	void SetBlendType(EBlend type);
+	// 炎のスケールの最大値を設定
+	void SetFlameScale(float flameScale);
+	// 炎のスケール値が最大値になるまでの時間を設定
+	void SetFlameScaleAnimTime(float flameScaleAnimTime);
 
 	// 削除フラグが立っているかどうか
 	bool IsDeath() const;
@@ -45,4 +54,8 @@ private:
 	float mElapsedTime;	// 経過時間
 	bool mIsDeath;		// 削除フラグ
 	CColliderSphere* mpCollider;
+	// 炎のスケールの最大値
+	float mFlameScale;
+	// 炎のスケール値が最大値になるまでの時間
+	float mFlameScaleAnimTime;
 };
