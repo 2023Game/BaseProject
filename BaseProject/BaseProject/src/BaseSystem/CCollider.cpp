@@ -206,6 +206,9 @@ void CCollider::Update()
 		// くっつける行列をメンバ変数にコピー
 		mAttachMtx = *mpAttachMtx;
 	}
+
+	// コライダーの情報の更新
+	UpdateCol();
 }
 
 // 矩形同士の衝突判定
