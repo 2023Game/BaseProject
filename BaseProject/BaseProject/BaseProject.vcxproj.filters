@@ -376,6 +376,9 @@
     <ClCompile Include="src\Game\CCactusNeedle.cpp">
       <Filter>ソース ファイル\Game\Character\Enemy</Filter>
     </ClCompile>
+    <ClCompile Include="src\BaseSystem\CFontData.cpp">
+      <Filter>ソース ファイル\BaseSystem\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\BaseSystem\CCollider.h">
@@ -683,6 +686,9 @@
     </ClInclude>
     <ClInclude Include="src\Game\CCactusNeedle.h">
       <Filter>ソース ファイル\Game\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BaseSystem\CFontData.h">
+      <Filter>ソース ファイル\BaseSystem\UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

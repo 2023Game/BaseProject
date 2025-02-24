@@ -3,16 +3,19 @@
 #include "CModelX.h"
 #include "CTexture.h"
 #include "CSound.h"
+#include "CFontData.h"
 
 //テンプレートの前宣言
 template CModel* CResourceManager::Load(std::string name, std::string path, bool dontDelete);
 template CModelX* CResourceManager::Load(std::string name, std::string path, bool dontDelete);
 template CTexture* CResourceManager::Load(std::string name, std::string path, bool dontDelete);
 template CSound* CResourceManager::Load(std::string name, std::string path, bool dontDelete);
+template CFontData* CResourceManager::Load(std::string name, std::string path, bool dontDelete);
 template CModel* CResourceManager::Get(std::string name);
 template CModelX* CResourceManager::Get(std::string name);
 template CTexture* CResourceManager::Get(std::string name);
 template CSound* CResourceManager::Get(std::string name);
+template CFontData* CResourceManager::Get(std::string name);
 
 //CResourceManagerのインスタンス
 CResourceManager* CResourceManager::mpInstance = nullptr;
@@ -64,11 +67,15 @@ T* CResourceManager::Load(std::string name, std::string path, bool dontDelete)
 		return dynamic_cast<T*>(find->second);
 	}
 
+	printf("Load Resource [%s] :\n  %s\n", name.c_str(), path.c_str());
+
 	// リソース読み込み
 	CResource* res = new T();
 	if (res == nullptr) return nullptr;
 	if (!res->Load(path, dontDelete))
 	{
+		printf("-> [Failed]\n");
+
 		// 読み込み失敗
 		delete res;
 		return nullptr;
@@ -77,6 +84,8 @@ T* CResourceManager::Load(std::string name, std::string path, bool dontDelete)
 
 	// リソースのリストに追加
 	list.insert(make_pair(name, res));
+
+	printf("-> [Success]\n");
 
 	// 読み込んだリソースを返す
 	return dynamic_cast<T*>(res);
@@ -103,6 +112,8 @@ void CResourceManager::Delete(std::string name)
 	auto find = list.find(name);
 	if (find == list.end()) return;
 
+	printf("Delete Resource [%s]\n", find->first.c_str());
+
 	CResource* res = find->second;
 	list.erase(find);
 	delete res;
@@ -119,6 +130,8 @@ void CResourceManager::DeleteInScene(EScene scene)
 		CResource* res = itr->second;
 		if (res->mSceneType == scene)
 		{
+			printf("Delete Resource [%s]\n", itr->first.c_str());
+
 			itr = list.erase(itr);
 			delete res;
 		}

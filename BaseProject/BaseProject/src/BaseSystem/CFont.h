@@ -2,6 +2,8 @@
 #include <FTGL/ftgl.h>
 #include <string>
 
+class CFontData;
+
 class CFont
 {
 public:
@@ -17,6 +19,9 @@ public:
 	void Render(const wchar_t* str);
 
 private:
-	FTPixmapFont* mpFont;
-	FTSimpleLayout* mpFontLayout;
+	CFontData* mpFontData;
+	int mFontSize;
+	FTGL::TextAlignment mTextAlign;
+	float mLineLength;
+	float mLineSpacing;
 };
