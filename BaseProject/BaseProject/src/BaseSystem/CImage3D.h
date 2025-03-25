@@ -5,6 +5,24 @@
 #include "CTriangle.h"
 #include "CMaterial.h"
 
+// 位置合わせの種類
+enum class EAlignment
+{
+	eUpperLeft,		// 左上
+	eUpperCenter,	// 上
+	eUpperRight,	// 右上
+
+	eMiddleLeft,	// 左
+	eMiddleCenter,	// 中央
+	eMiddleRight,	// 右
+
+	eLowerLeft,		// 左下
+	eLowerCenter,	// 下
+	eLowerRight,	// 右下
+
+	eDefault = eMiddleCenter,	// デフォルト
+};
+
 // 3D空間に配置するイメージ描画用クラス
 class CImage3D : public CObjectBase
 {
@@ -19,6 +37,14 @@ public:
 		bool addTaskList = true);
 	// デストラクタ
 	virtual ~CImage3D();
+
+	// テクスチャ読み込み
+	void Load(std::string path);
+
+	// イメージのアライメントを取得
+	EAlignment GetAlignment() const;
+	// イメージのアライメントを設定
+	void SetAlignment(EAlignment align);
 
 	// 2D空間でのオフセット座標を取得
 	const CVector2& GetOffsetPos() const;
@@ -67,6 +93,8 @@ public:
 	void Render() override;
 
 protected:
+	// 変更を頂点に反映
+	void ApplyVertices();
 	// アニメーションを再生できるかどうか
 	bool IsEnableAnim() const;
 	// 描画（マテリアル指定版）
@@ -76,12 +104,12 @@ protected:
 	CTriangle mT[2];
 	// マテリアル
 	CMaterial mMaterial;
+	// イメージのアライメント
+	EAlignment mAlignment;
 	// 2D空間でのオフセット座標
 	CVector2 mOffsetPos;
 	// サイズ記憶用
 	CVector2 mSize;
-	// 中心位置
-	CVector2 mCenter;
 	// テクスチャのUV
 	CRect mUV;
 	// 3D空間での縮尺

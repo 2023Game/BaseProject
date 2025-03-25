@@ -10,6 +10,7 @@ CImage3D::CImage3D(std::string path,
 	ETaskPauseType pause,
 	bool dontDelete, bool addTaskList)
 	: CObjectBase(tag, prio, sortOrder, pause, dontDelete, addTaskList)
+	, mAlignment(EAlignment::eDefault)
 	, mOffsetPos(0.0f, 0.0f)
 	, mUV(0.0f, 0.0f, 1.0f, 1.0f)
 	, mWolrdUnitPerPixel(WORLD_UNIT_PER_PIXEL)
@@ -22,14 +23,7 @@ CImage3D::CImage3D(std::string path,
 	, mIsLighting(false)
 {
 	// テクスチャ読み込み
-	mMaterial.LoadTexture(path, path, false);
-	CTexture* tex = mMaterial.Texture();
-
-	// 読み込んだテクスチャの
-	CVector2 size;
-	size.X(tex->Header().width);
-	size.Y(tex->Header().height);
-	SetSize(size);
+	Load(path);
 
 	SetColor(CColor::white);
 
@@ -40,6 +34,35 @@ CImage3D::CImage3D(std::string path,
 //デストラクタ
 CImage3D::~CImage3D()
 {
+}
+
+// テクスチャ読み込み
+void CImage3D::Load(std::string path)
+{
+	// テクスチャ読み込み
+	mMaterial.LoadTexture(path, path, false);
+	CTexture* tex = mMaterial.Texture();
+	if (tex != nullptr)
+	{
+		// 読み込んだテクスチャの
+		CVector2 size;
+		size.X(tex->Header().width);
+		size.Y(tex->Header().height);
+		SetSize(size);
+	}
+}
+
+// イメージのアライメントを取得
+EAlignment CImage3D::GetAlignment() const
+{
+	return mAlignment;
+}
+
+// イメージのアライメントを設定
+void CImage3D::SetAlignment(EAlignment align)
+{
+	mAlignment = align;
+	ApplyVertices();
 }
 
 // 2D空間でのオフセット座標を取得
@@ -76,24 +99,7 @@ void CImage3D::SetSize(const float& x, const float& y)
 void CImage3D::SetSize(const CVector2& size)
 {
 	mSize = size;
-	CVector2 s = mSize * (1.0f / mWolrdUnitPerPixel);
-
-	// 三角形の頂点座標設定
-	mT[0].Vertex
-	(
-		CVector(s.X(), s.Y(), 0.0f),
-		CVector(-s.X(), -s.Y(), 0.0f),
-		CVector(s.X(), -s.Y(), 0.0f)
-	);
-	mT[1].Vertex
-	(
-		CVector(-s.X(), s.Y(), 0.0f),
-		CVector(-s.X(), -s.Y(), 0.0f),
-		CVector(s.X(), s.Y(), 0.0f)
-	);
-	// 法線をZ軸方向
-	mT[0].Normal(CVector(0.0f, 0.0f, 1.0f));
-	mT[1].Normal(CVector(0.0f, 0.0f, 1.0f));
+	ApplyVertices();
 }
 
 // UV取得
@@ -146,6 +152,9 @@ void CImage3D::SetWorldUnitPerPixel(float pixel)
 // アニメーションデータを設定
 void CImage3D::SetAnimData(TexAnimData* animData)
 {
+	CTexture* tex = mMaterial.Texture();
+	if (tex == nullptr) return;
+
 	mpAnimData = animData;
 	mAnimNo = 0;
 	mElapsedTime = 0.0f;
@@ -162,7 +171,6 @@ void CImage3D::SetAnimData(TexAnimData* animData)
 		);
 		SetUV(uv);
 
-		CTexture* tex = mMaterial.Texture();
 		CVector2 size;
 		float ratio = (float)mpAnimData->col / mpAnimData->row;
 		size.X(tex->Header().width);
@@ -201,6 +209,44 @@ void CImage3D::SetDepthMask(bool enable)
 void CImage3D::SetLighting(bool enable)
 {
 	mIsLighting = enable;
+}
+
+// 変更を頂点に反映
+void CImage3D::ApplyVertices()
+{
+	CVector s = mSize * (1.0f / mWolrdUnitPerPixel) * 2.0f;
+
+	CVector start = CVector::zero;
+
+	if (mAlignment == EAlignment::eUpperLeft)			start = CVector(0.0f,			0.0f,			0.0f);
+	else if (mAlignment == EAlignment::eUpperCenter)	start = CVector(-s.X() * 0.5f,	0.0f,			0.0f);
+	else if (mAlignment == EAlignment::eUpperRight)		start = CVector(-s.X(),			0.0f,			0.0f);
+
+	else if (mAlignment == EAlignment::eMiddleLeft)		start = CVector(0.0f,			-s.Y() * 0.5f,	0.0f);
+	else if (mAlignment == EAlignment::eMiddleCenter)	start = CVector(-s.X() * 0.5f,	-s.Y() * 0.5f,	0.0f);
+	else if (mAlignment == EAlignment::eMiddleRight)	start = CVector(-s.X(),			-s.Y() * 0.5f,	0.0f);
+
+	else if (mAlignment == EAlignment::eLowerLeft)		start = CVector(0.0f,			-s.Y(),			0.0f);
+	else if (mAlignment == EAlignment::eLowerCenter)	start = CVector(-s.X() * 0.5f,	-s.Y(),			0.0f);
+	else if (mAlignment == EAlignment::eLowerRight)		start = CVector(-s.X(),			-s.Y(),			0.0f);
+
+	// 三角形の頂点座標設定
+	mT[0].Vertex
+	(
+		start + CVector(s.X(),	s.Y(),	0.0f),
+		start + CVector(0.0f,	0.0f,	0.0f),
+		start + CVector(s.X(),	0.0f,	0.0f)
+	);
+	mT[1].Vertex
+	(
+		start + CVector(0.0f,	s.Y(),	0.0f),
+		start + CVector(0.0f,	0.0f,	0.0f),
+		start + CVector(s.X(),	s.Y(),	0.0f)
+	);
+
+	// 法線をZ軸方向
+	mT[0].Normal(CVector(0.0f, 0.0f, 1.0f));
+	mT[1].Normal(CVector(0.0f, 0.0f, 1.0f));
 }
 
 // アニメーションを再生できるかどうか
@@ -262,6 +308,9 @@ void CImage3D::Render()
 // 描画（マテリアル指定版）
 void CImage3D::Render(CMaterial* mpMaterial)
 {
+	CTexture* tex = mMaterial.Texture();
+	if (tex == nullptr) return;
+
 	// 行列の保存
 	glPushMatrix();
 
