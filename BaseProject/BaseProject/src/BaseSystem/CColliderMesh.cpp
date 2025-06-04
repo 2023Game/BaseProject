@@ -8,6 +8,7 @@ CColliderMesh::CColliderMesh(CObjectBase* owner, ELayer layer, CModel* model,
 	, mDivZ(divZ)
 {
 	Set(model);
+	UpdateCol();
 }
 
 CColliderMesh::~CColliderMesh()
