@@ -47,6 +47,8 @@
     <ClCompile Include="src\BaseSystem\CModel.cpp" />
     <ClCompile Include="src\BaseSystem\CModelX.cpp" />
     <ClCompile Include="src\BaseSystem\CMyShader.cpp" />
+    <ClCompile Include="src\BaseSystem\CNavManager.cpp" />
+    <ClCompile Include="src\BaseSystem\CNavNode.cpp" />
     <ClCompile Include="src\BaseSystem\CRect.cpp" />
     <ClCompile Include="src\BaseSystem\CResource.cpp" />
     <ClCompile Include="src\BaseSystem\CResourceManager.cpp" />
@@ -144,6 +146,8 @@
     <ClInclude Include="src\BaseSystem\CModel.h" />
     <ClInclude Include="src\BaseSystem\CModelX.h" />
     <ClInclude Include="src\BaseSystem\CMyShader.h" />
+    <ClInclude Include="src\BaseSystem\CNavManager.h" />
+    <ClInclude Include="src\BaseSystem\CNavNode.h" />
     <ClInclude Include="src\BaseSystem\ColliderType.h" />
     <ClInclude Include="src\BaseSystem\CollisionLayer.h" />
     <ClInclude Include="src\BaseSystem\CRect.h" />

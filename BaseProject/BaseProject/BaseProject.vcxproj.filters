@@ -92,6 +92,9 @@
     <Filter Include="ソース ファイル\Game\Character\Enemy">
       <UniqueIdentifier>{ec280ca7-8243-49d0-adff-34255272bfe1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\BaseSystem\Navigation">
+      <UniqueIdentifier>{385f8279-0f7e-4273-9c5d-14919cbe6cd9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -378,6 +381,12 @@
     </ClCompile>
     <ClCompile Include="src\BaseSystem\CFontData.cpp">
       <Filter>ソース ファイル\BaseSystem\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BaseSystem\CNavManager.cpp">
+      <Filter>ソース ファイル\BaseSystem\Navigation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BaseSystem\CNavNode.cpp">
+      <Filter>ソース ファイル\BaseSystem\Navigation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -689,6 +698,12 @@
     </ClInclude>
     <ClInclude Include="src\BaseSystem\CFontData.h">
       <Filter>ソース ファイル\BaseSystem\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BaseSystem\CNavManager.h">
+      <Filter>ソース ファイル\BaseSystem\Navigation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BaseSystem\CNavNode.h">
+      <Filter>ソース ファイル\BaseSystem\Navigation</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

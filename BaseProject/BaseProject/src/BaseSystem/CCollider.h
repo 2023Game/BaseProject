@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "CTransform.h"
 #include "CollisionLayer.h"
 #include "ColliderType.h"
@@ -308,7 +309,7 @@ public:
 	/// <param name="hit">衝突した時の情報</param>
 	/// <returns>trueならば、衝突している</returns>
 	static bool CollisionCapsule(const CVector& cs0, const CVector& ce0, float cr0,
-		const CVector& cs1, const CVector& ce1, float cr1, 
+		const CVector& cs1, const CVector& ce1, float cr1,
 		CHitInfo* hit);
 
 	/// <summary>
@@ -334,7 +335,7 @@ public:
 	/// <param name="lb">線分のバウンディングボックス</param>
 	/// <param name="hit">衝突した時の情報</param>
 	/// <returns>trueならば、衝突している</returns>
-	static bool CollisionMeshLine(const std::list<STVertexData>& tris,
+	static bool CollisionMeshLine(const std::vector<STVertexData>& tris,
 		const CVector& ls, const CVector& le, const CBounds& lb,
 		CHitInfo* hit, bool isLeftMain);
 
@@ -345,7 +346,7 @@ public:
 	/// <param name="sphereCol">球コライダー</param>
 	/// <param name="hit">衝突した時の情報</param>
 	/// <returns>trueならば、衝突している</returns>
-	static bool CollisionMeshSpehre(const std::list<STVertexData>& tris,
+	static bool CollisionMeshSpehre(const std::vector<STVertexData>& tris,
 		CColliderSphere* sphereCol, CHitInfo* hit, bool isLeftMain);
 
 	/// <summary>
@@ -355,7 +356,7 @@ public:
 	/// <param name="triCol">三角形コライダー</param>
 	/// <param name="hit">衝突した時の情報</param>
 	/// <returns>trueならば、衝突している</returns>
-	static bool CollisionMeshTriangle(const std::list<STVertexData>& tris,
+	static bool CollisionMeshTriangle(const std::vector<STVertexData>& tris,
 		CColliderTriangle* triCol, CHitInfo* hit, bool isLeftMain);
 
 	/// <summary>
@@ -365,7 +366,7 @@ public:
 	/// <param name="capsuleCol">カプセルコライダー</param>
 	/// <param name="hit">衝突した時の情報</param>
 	/// <returns>trueならば、衝突している</returns>
-	static bool CollisionMeshCapsule(const std::list<STVertexData>& tris,
+	static bool CollisionMeshCapsule(const std::vector<STVertexData>& tris,
 		CColliderCapsule* capsuleCol, CHitInfo* hit, bool isLeftMain);
 
 	/// <summary>

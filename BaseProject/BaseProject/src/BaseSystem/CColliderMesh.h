@@ -1,6 +1,6 @@
 #ifndef CCOLLIDERMESH_H
 #define CCOLLIDERMESH_H
-#include <list>
+#include <vector>
 #include "CModel.h"
 #include "CCollider.h"
 
@@ -18,13 +18,17 @@ public:
 	/// <param name="model">モデルデータ</param>
 	/// <param name="isKinematic">trueならば、衝突時に押し戻しの影響を受けない</param>
 	/// <param name="weight">コライダーの重量</param>
+	/// <param name="divX">コライダーのX軸の分割数</param>
+	/// <param name="divY">コライダーのY軸の分割数</param>
+	/// <param name="divZ">コライダーのZ軸の分割数</param>
 	CColliderMesh(CObjectBase* owner, ELayer layer, CModel* model,
-		bool isKinematic = false, float weight = 1.0f);
+		bool isKinematic = false, float weight = 1.0f,
+		int divX = 1, int divY = 1, int divZ = 1);
 	// デストラクタ
 	~CColliderMesh();
 
 	void Set(CModel* model);
-	const std::list<STVertexData>& Get() const;
+	const std::vector<STVertexData>& Get() const;
 
 	// コライダー描画
 	void Render() override;
@@ -35,7 +39,10 @@ protected:
 
 private:
 	//三角コライダの配列作成
-	std::list<STVertexData> mVertices;
+	std::vector<STVertexData> mVertices;
+	int mDivX;
+	int mDivY;
+	int mDivZ;
 };
 
 #endif

@@ -1,8 +1,11 @@
 #include "CColliderMesh.h"
 
 CColliderMesh::CColliderMesh(CObjectBase* owner, ELayer layer, CModel* model,
-	bool isKinematic, float weight)
+	bool isKinematic, float weight, int divX, int divY, int divZ)
 	: CCollider(owner, layer, EColliderType::eMesh, isKinematic, weight)
+	, mDivX(divX)
+	, mDivY(divY)
+	, mDivZ(divZ)
 {
 	Set(model);
 }
@@ -19,6 +22,7 @@ void CColliderMesh::Set(CModel* model)
 
 	auto triangles = model->Triangles();
 	int count = triangles.size();
+	mVertices.reserve(count);
 	for (auto& tri : triangles)
 	{
 		STVertex v(tri.V0(), tri.V1(), tri.V2());
@@ -26,7 +30,7 @@ void CColliderMesh::Set(CModel* model)
 	}
 }
 
-const std::list<STVertexData>& CColliderMesh::Get() const
+const std::vector<STVertexData>& CColliderMesh::Get() const
 {
 	return mVertices;
 }
