@@ -1,7 +1,6 @@
 #include "CNavManager.h"
 #include "CNavNode.h"
 #include "CInput.h"
-#include "CField.h"
 #include "Primitive.h"
 #include <assert.h>
 
