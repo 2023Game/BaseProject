@@ -45,7 +45,8 @@ void CNavManager::AddNode(CNavNode* node)
 // 経路探索用のノードを取り除く
 void CNavManager::RemoveNode(CNavNode* node)
 {
-	std::remove(mNodes.begin(), mNodes.end(), node);
+	auto result = std::remove(mNodes.begin(), mNodes.end(), node);
+	mNodes.erase(result, mNodes.end());
 }
 
 // 指定したノードに接続できるノードを検索して設定
@@ -66,7 +67,7 @@ int CNavManager::FindConnectNavNodes(CNavNode* node, float distance)
 			float dist = (findNode->GetPos() - node->GetPos()).Length();
 			if (dist > distance) continue;
 		}
-		
+
 		// 自身から接続先のノードまでの遮蔽物チェック
 		CVector start = node->GetOffsetPos();
 		CVector end = findNode->GetOffsetPos();
@@ -184,7 +185,8 @@ void CNavManager::AddCollider(CCollider* col)
 // 遮蔽物チェックに使用するコライダーを取り除く
 void CNavManager::RemoveCollider(CCollider* col)
 {
-	std::remove(mColliders.begin(), mColliders.end(), col);
+	auto result = std::remove(mColliders.begin(), mColliders.end(), col);
+	mColliders.erase(result, mColliders.end());
 }
 
 // 全てのノードと経路を描画
