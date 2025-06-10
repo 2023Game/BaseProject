@@ -30,6 +30,9 @@ CNavNode::CNavNode(const CVector& pos, bool isDestNode)
 // デストラクタ
 CNavNode::~CNavNode()
 {
+	// 探索ノードを削除する前に、自身と接続しているノードを取り除く
+	ClearConnects();
+
 	// 管理クラスのリストから自身を取り除く
 	// 管理クラスのリストに自身を追加
 	CNavManager* navMgr = CNavManager::Instance();
