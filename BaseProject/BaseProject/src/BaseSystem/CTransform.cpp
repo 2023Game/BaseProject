@@ -388,7 +388,7 @@ void CTransform::SetParent(CTransform* parent)
 }
 
 // e‚ğæ“¾
-const CTransform* CTransform::GetParent() const
+CTransform* CTransform::GetParent() const
 {
 	return mpParent;
 }

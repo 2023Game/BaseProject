@@ -195,9 +195,9 @@ public:
 	/// 親を取得
 	/// </summary>
 	/// <returns>設定されている親</returns>
-	const CTransform* GetParent() const;
+	CTransform* GetParent() const;
 
-private:
+protected:
 	/// <summary>
 	/// 子のリストに追加
 	/// </summary>

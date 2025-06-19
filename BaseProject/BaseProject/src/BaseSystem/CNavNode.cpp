@@ -31,7 +31,7 @@ CNavNode::CNavNode(const CVector& pos, bool isDestNode)
 CNavNode::~CNavNode()
 {
 	// 探索ノードを削除する前に、自身と接続しているノードを取り除く
-	ClearConnects();
+	ClearConnects(true);
 
 	// 管理クラスのリストから自身を取り除く
 	// 管理クラスのリストに自身を追加
@@ -49,7 +49,7 @@ void CNavNode::SetEnable(bool enable)
 }
 
 // 現在有効かどうか
-bool CNavNode::IsEnabel() const
+bool CNavNode::IsEnable() const
 {
 	return mIsEnable;
 }
@@ -82,15 +82,62 @@ void CNavNode::SetPos(const CVector& pos)
 	mPosition = pos;
 
 	// 座標を変更したので、接続ノードを再検索
-	CNavManager* navMgr = CNavManager::Instance();
-	if (navMgr != nullptr)
+	UpdateConnectNode();
+}
+
+// 指定したノードと接続しているか
+bool CNavNode::IsConnectNode(CNavNode* node) const
+{
+	// 自身か、指定したノードが無効な状態であれば、接続していない
+	if (!IsEnable() || !node->IsEnable()) return false;
+
+	// 指定したノードが接続されているか確認
+	auto find = std::find_if
+	(
+		mConnectData.begin(), mConnectData.end(),
+		[node](const CNavConnectData& x) { return x.node == node; }
+	);
+	if (find != mConnectData.end())
 	{
-		navMgr->FindConnectNavNodes(this, FIND_NODE_DISTANCE);
+		// 接続されているかつ、接続状態が有効であれば、接続している
+		if (find->enabled) return true;
+	}
+
+	// 接続されていなかった
+	return false;
+}
+
+// 指定したノードとの接続状態を設定
+void CNavNode::SetEnableConnect(CNavNode* node, bool enable)
+{
+	// 指定したノードが接続されているか確認
+	auto find = std::find_if
+	(
+		mConnectData.begin(), mConnectData.end(),
+		[node](const CNavConnectData& x) { return x.node == node; }
+	);
+	// 接続されていたら、接続状態を変更
+	if (find != mConnectData.end())
+	{
+		find->enabled = enable;
 	}
 }
 
+// 指定したノードとの接続状態を返す
+bool CNavNode::IsEnableConnect(CNavNode* node) const
+{
+	// 指定したノードが接続されているか確認
+	auto find = std::find_if
+	(
+		mConnectData.begin(), mConnectData.end(),
+		[node](const CNavConnectData& x) { return x.node == node; }
+	);
+	if (find == mConnectData.end()) return false;
+	return find->enabled;
+}
+
 // 接続するノード追加
-void CNavNode::AddConnect(CNavNode* node)
+void CNavNode::AddConnect(CNavNode* node, bool forced)
 {
 	for (CNavConnectData& connect : mConnectData)
 	{
@@ -101,8 +148,8 @@ void CNavNode::AddConnect(CNavNode* node)
 	float cost = (node->GetPos() - mPosition).Length();
 
 	// 自身と相手それぞれの接続しているノードリストにお互いを設定
-	mConnectData.push_back(CNavConnectData(node, cost));
-	node->mConnectData.push_back(CNavConnectData(this, cost));
+	mConnectData.push_back(CNavConnectData(node, cost, forced));
+	node->mConnectData.push_back(CNavConnectData(this, cost, forced));
 }
 
 // 接続しているノードを取り除く
@@ -117,15 +164,95 @@ void CNavNode::RemoveConnect(CNavNode* node)
 }
 
 // 接続している全てのノードを解除
-void CNavNode::ClearConnects()
+void CNavNode::ClearConnects(bool forced)
 {
 	// 接続相手の接続リストから自身を取り除く
 	for (CNavConnectData& connect : mConnectData)
 	{
+		if (!forced && connect.forced) continue;
 		connect.node->RemoveConnect(this);
 	}
-	// 自身の接続リストをクリア
-	mConnectData.clear();
+
+	// 強制的に接続を解除するのであれば
+	if (forced)
+	{
+		// 自身の接続リストをクリア
+		mConnectData.clear();
+	}
+	// 強制でなければ
+	else
+	{
+		// 強制的に接続するノード以外の接続状態を解除
+		auto result = std::remove_if
+		(
+			mConnectData.begin(), mConnectData.end(),
+			[](const CNavConnectData& x) { return !x.forced; }
+		);
+		mConnectData.erase(result, mConnectData.end());
+	}
+}
+
+// 強制的に接続するノードを追加
+void CNavNode::AddForcedConnectNode(CNavNode* node)
+{
+	mForcedConnectNodes.push_back(node);
+	AddConnect(node, true);
+
+	node->mForcedConnectNodes.push_back(this);
+	node->AddConnect(this, true);
+}
+
+// 強制的に接続するノードを取り除く
+void CNavNode::RemoveForcedConnectNode(CNavNode* node)
+{
+	auto result = std::remove(mForcedConnectNodes.begin(), mForcedConnectNodes.end(), node);
+	mForcedConnectNodes.erase(result, mForcedConnectNodes.end());
+	RemoveConnect(node);
+
+	result = std::remove(node->mForcedConnectNodes.begin(), node->mForcedConnectNodes.end(), this);
+	node->mForcedConnectNodes.erase(result, node->mForcedConnectNodes.end());
+	node->RemoveConnect(this);
+}
+
+// 指定したノードが強制的に接続するノードかどうか
+bool CNavNode::IsForcedConnectNode(CNavNode* node) const
+{
+	auto find = std::find(mForcedConnectNodes.begin(), mForcedConnectNodes.end(), node);
+	return find != mForcedConnectNodes.end();
+}
+
+// 接続しないノードを追加
+void CNavNode::AddBlockedNode(CNavNode* node)
+{
+	mBlockedNodes.push_back(node);
+	node->mBlockedNodes.push_back(this);
+}
+
+// 接続しないノードを取り除く
+void CNavNode::RemoveBlockedNode(CNavNode* node)
+{
+	auto result = std::remove(mBlockedNodes.begin(), mBlockedNodes.end(), node);
+	mBlockedNodes.erase(result, mBlockedNodes.end());
+
+	result = std::remove(node->mBlockedNodes.begin(), node->mBlockedNodes.end(), this);
+	node->mBlockedNodes.erase(result, node->mBlockedNodes.end());
+}
+
+// 接続しないノードかどうか
+bool CNavNode::IsBlockedNode(CNavNode* node) const
+{
+	auto find = std::find(mBlockedNodes.begin(), mBlockedNodes.end(), node);
+	return find != mBlockedNodes.end();
+}
+
+// 接続しているノードを更新
+void CNavNode::UpdateConnectNode()
+{
+	CNavManager* navMgr = CNavManager::Instance();
+	if (navMgr != nullptr)
+	{
+		navMgr->FindConnectNavNodes(this, FIND_NODE_DISTANCE);
+	}
 }
 
 // ノードの色設定（デバッグ用）
@@ -144,13 +271,16 @@ void CNavNode::Render()
 	for (CNavConnectData& connect : mConnectData)
 	{
 		// 接続先のノードが無効であれば、スルー
-		if (!connect.node->IsEnabel()) continue;
+		if (!connect.node->IsEnable()) continue;
 
+		CColor color = CColor(0.11f, 0.1f, 0.1f, 1.0f);
+		// 接続しているが、現在接続状態を解除されている場合は、赤色のラインに変更
+		if (!connect.enabled) color = CColor(1.0f, 0.0f, 0.0f, 1.0f);
 		Primitive::DrawLine
 		(
 			GetOffsetPos(),
 			connect.node->GetOffsetPos(),
-			CColor(0.11f, 0.1f, 0.1f, 1.0f),
+			color,
 			2.0f
 		);
 	}

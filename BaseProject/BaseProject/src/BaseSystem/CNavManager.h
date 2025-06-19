@@ -40,6 +40,13 @@ public:
 	bool Navigate(CNavNode* start, CNavNode* goal, std::vector<CNavNode*>& route);
 
 	/// <summary>
+	/// 指定した経路が繋がっているかどうか
+	/// </summary>
+	/// <param name="route">繋がっているか確認する経路</param>
+	/// <returns>trueならば、経路が繋がっている</returns>
+	bool IsRouteValid(const std::vector<CNavNode*>& route) const;
+
+	/// <summary>
 	/// 遮蔽物チェックに使用するコライダーを追加
 	/// </summary>
 	/// <param name="col"></param>

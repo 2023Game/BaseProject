@@ -59,6 +59,10 @@ int CNavManager::FindConnectNavNodes(CNavNode* node, float distance)
 	{
 		//自分自身であれば、スルー
 		if (findNode == node) continue;
+		// 強制的に接続するノードであれば、スルー
+		if (node->IsForcedConnectNode(findNode)) continue;
+		// 接続しないノードであれば、スルー
+		if (node->IsBlockedNode(findNode)) continue;
 
 		// 目的地専用ノードは距離を考慮しない
 		if (!node->mIsDestNode)
@@ -112,7 +116,9 @@ void CNavManager::CalcNextMoveCost(CNavNode* node, CNavNode* goal)
 	for (CNavConnectData& connect : node->mConnectData)
 	{
 		// 接続先のノードが無効であれば、スルー
-		if (!connect.node->IsEnabel()) continue;
+		if (!connect.node->IsEnable()) continue;
+		// 接続解除されている状態であれば、スルー
+		if (!connect.enabled) continue;
 
 		// 接続しているノードが目的地専用ノードの場合は、
 		// 今回の経路探索の目的地ノード以外は経由しないため、スルー
@@ -143,7 +149,7 @@ bool CNavManager::Navigate(CNavNode* start, CNavNode* goal, std::vector<CNavNode
 	// 開始ノードまたは目的地ノードが空だった場合は、経路探索不可
 	if (start == nullptr || goal == nullptr)return false;
 	// 開始ノードまたは目的地ノードが無効だった場合は、経路探索不可
-	if (!start->IsEnabel() || !goal->IsEnabel()) return false;
+	if (!start->IsEnable() || !goal->IsEnable()) return false;
 
 	// 全てのノードの最短経路計算用のデータをクリア
 	ResetCalcData();
@@ -174,6 +180,25 @@ bool CNavManager::Navigate(CNavNode* start, CNavNode* goal, std::vector<CNavNode
 	// 求め最短経路の1バン最初のノードが開始ノードであれば、
 	// 開始ノードから目的地ノードまで経路が繋がっている
 	return route[0] == start;
+}
+
+// 指定した経路が繋がっているかどうか
+bool CNavManager::IsRouteValid(const std::vector<CNavNode*>& route) const
+{
+	// 指定した経路に2つ以上ノードが登録されていないと
+	// 経路と見なさないため、経路は繋がっていないと判定する
+	int size = route.size();
+	if (size <= 1) return false;
+
+	// 指定した経路のノードを先頭から順番に繋がっているか確認
+	for (int i = 0; i < size - 1; i++)
+	{
+		// 現在のノードと次のノードが繋がっていなければ、経路が繋がっていない
+		if (!route[i]->IsConnectNode(route[i + 1])) return false;
+	}
+
+	// 経路が繋がっていた
+	return true;
 }
 
 // 遮蔽物チェックに使用するコライダーを追加
