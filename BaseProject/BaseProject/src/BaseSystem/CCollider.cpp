@@ -299,110 +299,86 @@ bool CCollider::CollisionTriangleLine(
 	return true;
 }
 
+// 指定した点と三角形の最近接点を計算
+CVector CCollider::ClosestPointOnTriangle(const CVector& p, const CVector& t0, const CVector& t1, const CVector& t2)
+{
+	CVector v01 = t1 - t0;
+	CVector v02 = t2 - t0;
+	CVector v0p = p - t0;
+
+	float d1 = CVector::Dot(v01, v0p);
+	float d2 = CVector::Dot(v02, v0p);
+	if (d1 <= 0.0f && d2 <= 0.0f) return t0;
+
+	CVector v1p = p - t1;
+	float d3 = CVector::Dot(v01, v1p);
+	float d4 = CVector::Dot(v02, v1p);
+	if (d3 >= 0.0f && d4 <= d3) return t1;
+
+	float v2 = d1 * d4 - d3 * d2;
+	if (v2 <= 0.0f && d1 >= 0.0f && d3 <= 0.0f)
+	{
+		float v = d1 / (d1 - d3);
+		return t0 + v01 * v;
+	}
+
+	CVector v2p = p - t2;
+	float d5 = CVector::Dot(v01, v2p);
+	float d6 = CVector::Dot(v02, v2p);
+	if (d6 >= 0.0f && d5 <= d6) return t2;
+
+	float v1 = d5 * d2 - d1 * d6;
+	if (v1 <= 0.0f && d2 >= 0.0f && d6 <= 0.0f)
+	{
+		float w = d2 / (d2 - d6);
+		return t0 + v02 * w;
+	}
+
+	float v0 = d3 * d6 - d5 * d4;
+	if (v0 <= 0.0f && (d4 - d3) >= 0.0f && (d5 - d6) >= 0.0f)
+	{
+		float w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+		return t1 + (t2 - t1) * w;
+	}
+
+	float denom = 1.0f / (v0 + v1 + v2);
+	float v = v1 * denom;
+	float w = v2 * denom;
+	return t0 + v01 * v + v02 * w;
+}
+
 // 三角形とカプセルの衝突判定
 bool CCollider::CollisionTriangleCapsule(
 	const CVector& t0, const CVector& t1, const CVector& t2,
 	const CVector& cs, const CVector& ce, float cr,
 	CHitInfo* h, bool isLeftMain)
 {
-	// 三角形の法線を算出
-	CVector n = CVector::Cross(t1 - t0, t2 - t0).Normalized();
+	const int steps = 5;
+	float minDist = FLT_MAX;
+	CVector adjust = CVector::zero;
 
-	// カプセルの始点から三角形の頂点までのベクトルを求める
-	CVector vs = cs - t0;
-	// カプセルの終点から三角形の頂点までのベクトルを求める
-	CVector ve = ce - t0;
-
-	// 各ベクトルと三角形の法線との内積を求める
-	float d1 = CVector::Dot(vs, n);
-	float d2 = CVector::Dot(ve, n);
-
-	// パターン①
-	// カプセルを構成する三角形が交差していたら、線分と三角形の衝突判定を行う
-	// （各内積の結果を乗算してマイナスの場合は、
-	// 　カプセルを構成する線分が三角形と交差している）
-	if (d1 * d2 < 0.0f)
+	for (int i = 0; i <= steps; i++)
 	{
-		// 線分と三角形の衝突判定を行う
-		if (CollisionTriangleLine(t0, t1, t2, cs, ce, h, isLeftMain))
+		float t = float(i) / steps;
+		CVector p = CVector::Lerp(cs, ce, t);
+		CVector q = ClosestPointOnTriangle(p, t0, t1, t2);
+
+		CVector diff = p - q;
+		float dist = diff.Length();
+
+		if (dist < cr)
 		{
-			// 衝突していた場合は、押し戻しベクトルに
-			// カプセルの半径分の長さを追加して返す
-			h->adjust += h->adjust.Normalized() * cr;
-			return true;
+			float len = cr - dist;
+			CVector dir = (dist > EPSILON) ? diff.Normalized() : CVector::up;
+			adjust = dir * len;
+			minDist = dist;
 		}
 	}
 
-
-	// 始点と終点を垂直に下ろした最近点を求める
-	CVector c1 = cs - n * d1;
-	CVector c2 = ce - n * d2;
-	// 始点と終点の押し戻し量を求める
-	CVector v1, v2;
-	if (fabsf(d1) <= cr) v1 = (c1 + n * cr) - cs;
-	if (fabsf(d2) <= cr) v2 = (c2 + n * cr) - ce;
-
-	// パターン②
-	// カプセルを構成する線分の始点と終点から三角形への距離を求め、
-	// カプセルの半径より近い（めり込んでいる）場合は、押し戻す
+	if (minDist < cr)
 	{
-		float l1 = FLT_MAX, l2 = FLT_MAX;
-		// 求めた最近点が三角形の内側かつ、距離が半径以下であれば、
-		// 距離と押し戻しベクトルを求める
-		if (IsInsideTriangle(c1, t0, t1, t2, n) && fabsf(d1) <= cr) l1 = v1.LengthSqr();
-		if (IsInsideTriangle(c2, t0, t1, t2, n) && fabsf(d2) <= cr) l2 = v2.LengthSqr();
-
-		if (l1 < FLT_MAX || l2 < FLT_MAX)
-		{
-			if (l1 < FLT_MAX && l2 < FLT_MAX) h->adjust = l1 >= l2 ? v1 : v2;
-			else h->adjust = l1 < FLT_MAX ? v1 : v2;
-			if (isLeftMain) h->adjust = -h->adjust;
-			return true;
-		}
-	}
-
-	// パターン③
-	// カプセルを構成する線分と三角形の各辺の距離を求め、
-	// カプセルの半径より近い場合は押し戻す
-	{
-		float e1 = CalcDistanceLine(t0, t1, cs, ce);
-		float e2 = CalcDistanceLine(t1, t2, cs, ce);
-		float e3 = CalcDistanceLine(t2, t0, cs, ce);
-		if (std::min(std::min(e1, e2), e3) <= cr)
-		{
-			if (e1 <= e2 && e1 <= e3)
-			{
-				CVector cv = CVector::Cross(t1 - t0, ce - cs).Normalized();
-				if (cv.LengthSqr() == 0.0f)
-				{
-					CVector nv = (t1 - t0).Normalized();
-					cv = (t0 + nv * CVector::Dot(cs - t0, nv) - cs).Normalized();
-				}
-				h->adjust = cv * (cr - e1);
-			}
-			else if (e2 <= e1 && e2 <= e3)
-			{
-				CVector cv = CVector::Cross(t2 - t1, ce - cs).Normalized();
-				if (cv.LengthSqr() == 0.0f)
-				{
-					CVector nv = (t2 - t1).Normalized();
-					cv = (t1 + nv * CVector::Dot(cs - t1, nv) - cs).Normalized();
-				}
-				h->adjust = cv * (cr - e2);
-			}
-			else
-			{
-				CVector cv = CVector::Cross(t0 - t2, ce - cs).Normalized();
-				if (cv.LengthSqr() == 0.0f)
-				{
-					CVector nv = (t0 - t2).Normalized();
-					cv = (t2 + nv * CVector::Dot(cs - t2, nv) - cs).Normalized();
-				}
-				h->adjust = cv * (cr - e3);
-			}
-			if (!isLeftMain) h->adjust = -h->adjust;
-			return true;
-		}
+		h->adjust = isLeftMain ? -adjust : adjust;
+		return true;
 	}
 
 	h->adjust = CVector::zero;

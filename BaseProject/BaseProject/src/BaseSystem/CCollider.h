@@ -401,6 +401,16 @@ public:
 	static bool IsInsideTriangle(const CVector& p, const CVector& t0, const CVector& t1, const CVector& t2, const CVector& n);
 
 	/// <summary>
+	/// 指定した点と三角形の最近接点を計算
+	/// </summary>
+	/// <param name="p"></param>
+	/// <param name="t0"></param>
+	/// <param name="t1"></param>
+	/// <param name="t2"></param>
+	/// <returns></returns>
+	static CVector ClosestPointOnTriangle(const CVector& p, const CVector& t0, const CVector& t1, const CVector& t2);
+
+	/// <summary>
 	/// 衝突判定
 	/// </summary>
 	/// <param name="c0">コライダ1</param>
