@@ -43,8 +43,8 @@ void CGameCamera2::LookAt(const CVector& eye, const CVector& at, const CVector& 
 	}
 }
 
-// 更新
-void CGameCamera2::Update()
+// 後更新
+void CGameCamera2::LateUpdate()
 {
 	// 追従するターゲットが設定されていれば、
 	if (mFollowTargetTf != nullptr)

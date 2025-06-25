@@ -98,8 +98,8 @@ void CDebugCamera::Off()
 	}
 }
 
-// 更新
-void CDebugCamera::Update()
+// 後更新
+void CDebugCamera::LateUpdate()
 {
 	// [SHIFT] + [0]でデバッグカメラのオンオフ切り替え
 	if (CDebugInput::Key(VK_SHIFT))
@@ -178,7 +178,7 @@ void CDebugCamera::Update()
 	CDebugPrint::Print("■■■■■■■■■■■■■■■■■■■■■■■\n");
 
 	// カメラのベース更新
-	CCamera::Update();
+	CCamera::LateUpdate();
 }
 
 #endif

@@ -24,6 +24,8 @@ public:
 	virtual ~CTask();
 	//更新
 	virtual void Update();
+	//後更新
+	virtual void LateUpdate();
 	//描画
 	virtual void Render();
 

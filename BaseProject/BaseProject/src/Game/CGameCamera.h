@@ -15,6 +15,6 @@ public:
 	// デストラクタ
 	~CGameCamera();
 
-	// 更新
-	void Update() override;
+	// 後更新
+	void LateUpdate() override;
 };

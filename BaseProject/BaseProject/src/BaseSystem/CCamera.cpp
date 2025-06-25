@@ -342,8 +342,8 @@ void CCamera::ApplyCollision()
 	}
 }
 
-// 更新
-void CCamera::Update()
+// 後更新
+void CCamera::LateUpdate()
 {
 	// 追従するターゲットが設定されていれば、
 	// カメラの位置を追従ターゲットの位置に合わせる

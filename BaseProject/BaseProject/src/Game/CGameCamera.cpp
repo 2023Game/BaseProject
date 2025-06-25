@@ -15,8 +15,8 @@ CGameCamera::~CGameCamera()
 {
 }
 
-// 更新
-void CGameCamera::Update()
+// 後更新
+void CGameCamera::LateUpdate()
 {
 	// マウスの横方向の移動量に合わせて、回転値（クォータニオン）を求める
 	CVector2 delta = CInput::GetDeltaMousePos();
@@ -31,5 +31,5 @@ void CGameCamera::Update()
 	Rotation(CQuaternion::LookRotation(forward));
 
 	// カメラのベースの更新処理
-	CCamera::Update();
+	CCamera::LateUpdate();
 }

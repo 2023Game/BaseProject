@@ -19,8 +19,8 @@ public:
 	void LookAt(const CVector& eye, const CVector& at,
 		const CVector& up, bool updateTargetEye = true) override;
 
-	// 更新
-	void Update() override;
+	// 後更新
+	void LateUpdate() override;
 
 private:
 	CVector mFollowDefaultEyeVec;

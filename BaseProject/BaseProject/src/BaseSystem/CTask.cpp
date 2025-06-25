@@ -44,6 +44,11 @@ void CTask::Update()
 {
 }
 
+//ŒãXV
+void CTask::LateUpdate()
+{
+}
+
 //•`‰æ
 void CTask::Render()
 {

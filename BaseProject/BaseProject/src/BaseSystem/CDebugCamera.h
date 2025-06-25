@@ -19,8 +19,8 @@ public:
 	// デバッグカメラをオフ
 	static void Off();
 
-	// 更新
-	void Update() override;
+	// 後更新
+	void LateUpdate() override;
 
 private:
 	// コンストラクタ

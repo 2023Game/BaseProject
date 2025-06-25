@@ -407,63 +407,23 @@ bool CCollider::CollisionTriangleSphere(
 	const CVector& sp, const float sr,
 	CHitInfo* h, bool isLeftMain)
 {
-	// 三角形の法線を求める
-	CVector n = CVector::Cross(t1 - t0, t2 - t0).Normalized();
-	// 法線の長さが0であれば、無効な三角形なため、衝突していない
-	if (n.LengthSqr() <= 0.0f) return false;
+	// 球の中心座標と三角形ポリゴンの最近接点を求める
+	CVector q = ClosestPointOnTriangle(sp, t0, t1, t2);
 
-	// 三角形から球までの距離を求めて、
-	// 距離が球の半径より離れていたら、衝突していない
-	CVector v = sp - t0;
-	float dist = CVector::Dot(v, n);
-	if (fabsf(dist) > sr) return false;
-
-	// 球の中心点から三角形へ垂直に下ろした点を求める
-	CVector point = sp + (-n * dist);
-	// 求めた点が三角形の範囲内か調べる
-	if (CollisionTrianglePoint(t0, t1, t2, n, point))
+	// 最近接点までの距離が半径より小さいと衝突している
+	CVector diff = sp - q;
+	float dist = diff.Length();
+	if (dist < sr)
 	{
-		// 範囲内であれば、衝突しているので、
-		// 押し戻し量を計算
-		float l = (sr - fabsf(dist)) * (dist < 0.0f ? -1.0f : 1.0f);
-		h->adjust = n * l * (isLeftMain ? -1.0f : 1.0f);
+		// 押し戻し量と押し戻し方向を計算
+		float len = sr - dist;
+		CVector dir = (dist > EPSILON) ? diff.Normalized() : CVector::up;
+		CVector adjust = dir * len;
+		h->adjust = isLeftMain ? -adjust : adjust;
 		return true;
 	}
 
-	// 垂直に下ろした点が三角形の範囲外の場合、
-	// 各辺と球が衝突していないか確認
-
-	// 三角形の各辺との最短距離を求め、
-	// 半径より小さい場合は衝突しているため、
-	// その辺との押し戻し量を計算して返す
-
-	// 三角形の頂点0から頂点1までの辺
-	dist = CalcDistancePointToLine(sp, t0, t1);
-	if (dist <= sr)
-	{
-		float l = sr - dist;
-		h->adjust = n * l * (isLeftMain ? -1.0f : 1.0f);
-		return true;
-	}
-	// 三角形の頂点1から頂点2までの辺
-	dist = CalcDistancePointToLine(sp, t1, t2);
-	if (dist <= sr)
-	{
-		float l = sr - dist;
-		h->adjust = n * l * (isLeftMain ? -1.0f : 1.0f);
-		return true;
-	}
-	// 三角形の頂点2から頂点0までの辺
-	dist = CalcDistancePointToLine(sp, t2, t0);
-	if (dist <= sr)
-	{
-		float l = sr - dist;
-		h->adjust = n * l * (isLeftMain ? -1.0f : 1.0f);
-		return true;
-	}
-
-	// 三角形の範囲外かつ、各辺とも衝突していない場合は、
-	// 完全に衝突していない
+	// 衝突していない
 	return false;
 }
 
