@@ -30,6 +30,10 @@ public:
 	//+=演算子のオーバーロード
 	//CMatrix1 += CMatrix2 の演算を行う
 	void operator+=(const CMatrix& m);
+	// CMatrix == CMatrix の結果を返す
+	bool operator == (const CMatrix& m) const;
+	// CMatrix != CMatrix の結果を返す
+	bool operator != (const CMatrix& m) const;
 	//クオータニオンで回転行列を設定する
 	CMatrix Quaternion(float x, float y, float z, float w);
 	CVector Position() const;

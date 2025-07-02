@@ -43,8 +43,12 @@ public:
 	/// </summary>
 	void CollisionAll();
 
+#if _DEBUG
 	// 全コライダーを描画
 	void Render();
+	// 全コライダーのバウンディングボックスを描画
+	void RenderBounds();
+#endif
 
 private:
 	// コンストラクタ
@@ -58,4 +62,6 @@ private:
 	std::list<CCollider*> mColliderList;
 	// コライダーを描画するかどうか
 	bool mIsShowCollider;
+	// コライダーのバウンディングボックスを描画するかどうか
+	bool mIsShowColliderBounds;
 };

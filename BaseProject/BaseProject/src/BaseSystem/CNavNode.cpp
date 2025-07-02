@@ -24,7 +24,7 @@ CNavNode::CNavNode(const CVector& pos, bool isDestNode)
 	}
 
 	// 座標を設定
-	SetPos(mPosition);
+	SetPos(mPosition, true);
 }
 
 // デストラクタ
@@ -49,7 +49,7 @@ void CNavNode::SetEnable(bool enable)
 }
 
 // 現在有効かどうか
-bool CNavNode::IsEnable() const
+bool CNavNode::IsEnable() const 
 {
 	return mIsEnable;
 }
@@ -76,8 +76,11 @@ CVector CNavNode::GetOffsetPos() const
 }
 
 // ノードの座標を設定
-void CNavNode::SetPos(const CVector& pos)
+void CNavNode::SetPos(const CVector& pos, bool isInit)
 {
+	// 位置が変わってなければ、設定しない
+	if (!isInit && pos == mPosition) return;
+
 	// ノードの座標を更新
 	mPosition = pos;
 

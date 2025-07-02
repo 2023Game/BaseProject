@@ -68,8 +68,8 @@ int CNavManager::FindConnectNavNodes(CNavNode* node, float distance)
 		if (!node->mIsDestNode)
 		{
 			// 指定された距離の限界値を超える場合は、スルー
-			float dist = (findNode->GetPos() - node->GetPos()).Length();
-			if (dist > distance) continue;
+			float dist = (findNode->GetPos() - node->GetPos()).LengthSqr();
+			if (dist > distance * distance) continue;
 		}
 
 		// 自身から接続先のノードまでの遮蔽物チェック

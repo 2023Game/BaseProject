@@ -33,12 +33,14 @@ public:
 	/// <param name="rad">球の半径</param>
 	void Get(CVector* pos, float* rad) const;
 
+#if _DEBUG
 	// コライダー描画
 	void Render() override;
+#endif
 
 protected:
 	// コライダーの情報を更新
-	void UpdateCol() override;
+	void UpdateCol(bool isInit = false) override;
 
 private:
 	float mRadius;	// 球の半径

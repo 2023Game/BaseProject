@@ -298,6 +298,28 @@ CVector CVector::Slerp(const CVector& a, const CVector& b, float t)
 	return v.Normalized();
 }
 
+// 2つのベクトルの各軸最小値を求める
+CVector CVector::Min(const CVector& a, const CVector& b)
+{
+	return CVector
+	(
+		std::min(a.X(), b.X()),
+		std::min(a.Y(), b.Y()),
+		std::min(a.Z(), b.Z())
+	);
+}
+
+// 2つのベクトルの各軸最大値を求める
+CVector CVector::Max(const CVector& a, const CVector& b)
+{
+	return CVector
+	(
+		std::max(a.X(), b.X()),
+		std::max(a.Y(), b.Y()),
+		std::max(a.Z(), b.Z())
+	);
+}
+
 //------------------------------
 // 2次元ベクトル
 //------------------------------
@@ -506,6 +528,26 @@ CVector2 CVector2::LerpUnclamped(const CVector2& a, const CVector2& b, float t)
 	return a + (b - a) * t;
 }
 
+// 2つのベクトルの各軸最小値を求める
+CVector2 CVector2::Min(const CVector2& a, const CVector2& b)
+{
+	return CVector2
+	(
+		std::min(a.X(), b.X()),
+		std::min(a.Y(), b.Y())
+	);
+}
+
+// 2つのベクトルの各軸最大値を求める
+CVector2 CVector2::Max(const CVector2& a, const CVector2& b)
+{
+	return CVector2
+	(
+		std::max(a.X(), b.X()),
+		std::max(a.Y(), b.Y())
+	);
+}
+
 //------------------------------
 // CVector4
 //------------------------------
@@ -682,6 +724,30 @@ CVector4 CVector4::operator*(const CMatrix& m) const
 		ret.V(i, v);
 	}
 	return ret;
+}
+
+// 2つのベクトルの各軸最小値を求める
+CVector4 CVector4::Min(const CVector4& a, const CVector4& b)
+{
+	return CVector4
+	(
+		std::min(a.X(), b.X()),
+		std::min(a.Y(), b.Y()),
+		std::min(a.Z(), b.Z()),
+		std::min(a.W(), b.W())
+	);
+}
+
+// 2つのベクトルの各軸最大値を求める
+CVector4 CVector4::Max(const CVector4& a, const CVector4& b)
+{
+	return CVector4
+	(
+		std::max(a.X(), b.X()),
+		std::max(a.Y(), b.Y()),
+		std::max(a.Z(), b.Z()),
+		std::max(a.W(), b.W())
+	);
 }
 
 //CMatrix * CVector の演算結果を返す

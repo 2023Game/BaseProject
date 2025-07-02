@@ -35,6 +35,7 @@ void CColliderTriangle::Get(CVector* v0, CVector* v1, CVector* v2) const
 	*v2 = mWV[2];
 }
 
+#if _DEBUG
 // コライダー描画
 void CColliderTriangle::Render()
 {
@@ -77,12 +78,17 @@ void CColliderTriangle::Render()
 	// 描画前の行列に戻す
 	glPopMatrix();
 }
+#endif
 
 // コライダーの情報を更新
-void CColliderTriangle::UpdateCol()
+void CColliderTriangle::UpdateCol(bool isInit)
 {
-	// 行列を反映した各頂点の座標を計算
+	// 前回の更新と同じ行列であれば、処理しない
 	CMatrix m = Matrix();
+	if (!isInit && m == mLastMtx) return;
+	mLastMtx = m;
+
+	// 行列を反映した各頂点の座標を計算
 	mWV[0] = mV[0] * m;
 	mWV[1] = mV[1] * m;
 	mWV[2] = mV[2] * m;

@@ -38,6 +38,7 @@ float CColliderLine::Radius() const
 	return mRadius;
 }
 
+#if _DEBUG
 void CColliderLine::Render()
 {
 	// 現在の行列を退避しておく
@@ -79,12 +80,17 @@ void CColliderLine::Render()
 	// 描画前の行列に戻す
 	glPopMatrix();
 }
+#endif
 
 // コライダーの情報を更新
-void CColliderLine::UpdateCol()
+void CColliderLine::UpdateCol(bool isInit)
 {
-	// 頂点のワールド座標を算出
+	// 前回の更新と同じ行列であれば、処理しない
 	CMatrix m = Matrix();
+	if (!isInit && m == mLastMtx) return;
+	mLastMtx = m;
+
+	// 頂点のワールド座標を算出
 	mWV[0] = mV[0] * m;
 	mWV[1] = mV[1] * m;
 

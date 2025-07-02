@@ -69,7 +69,7 @@ void CBounds::Size(const CVector& size)
 // サイズを取得
 CVector CBounds::Size() const
 {
-	return (mMax - mMin) * 0.5f;
+	return mMax - mMin;
 }
 
 // 2つのバウンディングボックスが交差するかどうか
@@ -86,17 +86,8 @@ bool CBounds::Intersect(const CBounds& b0, const CBounds& b1)
 // 線分のバウンディングボックスを取得
 CBounds CBounds::GetLineBounds(const CVector& ls, const CVector& le)
 {
-	CVector min, max;
-	min = ls;
-	max = ls;
-
-	min.X(std::min(min.X(), le.X()));
-	min.Y(std::min(min.Y(), le.Y()));
-	min.Z(std::min(min.Z(), le.Z()));
-
-	max.X(std::max(max.X(), le.X()));
-	max.Y(std::max(max.Y(), le.Y()));
-	max.Z(std::max(max.Z(), le.Z()));
+	CVector min = CVector::Min(ls, le);
+	CVector max = CVector::Max(ls, le);
 
 	CBounds ret;
 	ret.SetRange(min, max);
@@ -117,23 +108,8 @@ CBounds CBounds::GetSphereBounds(const CVector& pos, float rad)
 // 三角形のバウンディングボックスを取得
 CBounds CBounds::GetTriangleBounds(const CVector& t0, const CVector& t1, const CVector& t2)
 {
-	CVector min, max;
-	min = t0;
-	max = t0;
-
-	min.X(std::min(min.X(), t1.X()));
-	min.Y(std::min(min.Y(), t1.Y()));
-	min.Z(std::min(min.Z(), t1.Z()));
-	min.X(std::min(min.X(), t2.X()));
-	min.Y(std::min(min.Y(), t2.Y()));
-	min.Z(std::min(min.Z(), t2.Z()));
-
-	max.X(std::max(max.X(), t1.X()));
-	max.Y(std::max(max.Y(), t1.Y()));
-	max.Z(std::max(max.Z(), t1.Z()));
-	max.X(std::max(max.X(), t2.X()));
-	max.Y(std::max(max.Y(), t2.Y()));
-	max.Z(std::max(max.Z(), t2.Z()));
+	CVector min = CVector::Min(t0, CVector::Min(t1, t2));
+	CVector max = CVector::Max(t0, CVector::Max(t1, t2));
 
 	CBounds ret;
 	ret.SetRange(min, max);
@@ -147,14 +123,10 @@ CBounds CBounds::GetCapsuleBounds(const CVector& cs, const CVector& ce, float cr
 	CVector max = cs + CVector::one * cr;
 
 	CVector cem = ce - CVector::one * cr;
-	min.X(std::min(min.X(), cem.X()));
-	min.Y(std::min(min.Y(), cem.Y()));
-	min.Z(std::min(min.Z(), cem.Z()));
+	min = CVector::Min(min, cem);
 
 	CVector cep = ce + CVector::one * cr;
-	max.X(std::max(max.X(), cep.X()));
-	max.Y(std::max(max.Y(), cep.Y()));
-	max.Z(std::max(max.Z(), cep.Z()));
+	max = CVector::Max(max, cep);
 
 	CBounds ret;
 	ret.SetRange(min, max);

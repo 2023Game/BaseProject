@@ -23,6 +23,8 @@ struct STVertexData
 	CBounds bounds;
 };
 
+struct STDivMesh;
+
 // ヒット情報
 class CHitInfo
 {
@@ -70,6 +72,17 @@ public:
 	/// </summary>
 	/// <returns>trueならば有効</returns>
 	bool IsEnable() const;
+
+	/// <summary>
+	/// コライダーをデバッグ表示するかどうかを設定
+	/// </summary>
+	/// <param name="isShow"></param>
+	void SetShow(bool isShow);
+	/// <summary>
+	/// コライダーをデバッグ表示するかどうか
+	/// </summary>
+	/// <returns></returns>
+	bool IsShow() const;
 
 	/// <summary>
 	/// 衝突時の押し戻しの影響を受けるかどうかを設定
@@ -149,8 +162,13 @@ public:
 
 	// コライダー更新
 	void Update();
+
+#if _DEBUG
 	// コライダー描画
 	virtual void Render() = 0;
+	// コライダーのバウンディングボックスを描画
+	virtual void RenderBounds();
+#endif
 
 	/// <summary>
 	/// 矩形同士の衝突判定
@@ -195,6 +213,20 @@ public:
 	/// <returns>trueならば、衝突している</returns>
 	static bool CollisionTriangleLine(const CVector& t0, const CVector& t1, const CVector& t2,
 		const CVector& ls, const CVector& le,
+		CHitInfo* hit, bool isLeftMain);
+
+	/// <summary>
+	/// 三角形とレイの衝突判定
+	/// </summary>
+	/// <param name="t0">三角形の頂点1</param>
+	/// <param name="t1">三角形の頂点2</param>
+	/// <param name="t2">三角形の頂点3</param>
+	/// <param name="rs">レイの始点</param>
+	/// <param name="re">レイの終点</param>
+	/// <param name="hit">衝突した時の情報</param>
+	/// <returns>trueならば、衝突している</returns>
+	static bool CollisionTriangleRay(const CVector& t0, const CVector& t1, const CVector& t2,
+		const CVector& rs, const CVector& re,
 		CHitInfo* hit, bool isLeftMain);
 
 	/// <summary>
@@ -340,6 +372,19 @@ public:
 		CHitInfo* hit, bool isLeftMain);
 
 	/// <summary>
+	/// メッシュとレイの衝突判定
+	/// </summary>
+	/// <param name="mesh">メッシュデータ</param>
+	/// <param name="rs">レイの始点</param>
+	/// <param name="re">レイの終点</param>
+	/// <param name="rb">レイのバウンディングボックス</param>
+	/// <param name="hit">衝突した時の情報</param>
+	/// <returns>trueならば、衝突している</returns>
+	static bool CollisionMeshRay(CColliderMesh* mesh,
+		const CVector& rs, const CVector& re, const CBounds& rb,
+		CHitInfo* hit, bool isLeftMain);
+
+	/// <summary>
 	/// メッシュと球の衝突判定
 	/// </summary>
 	/// <param name="tris">メッシュを構成する三角形ポリゴンのリスト</param>
@@ -439,7 +484,7 @@ public:
 
 protected:
 	// コライダーの情報を更新
-	virtual void UpdateCol() = 0;
+	virtual void UpdateCol(bool isInit = false) = 0;
 
 	/// <summary>
 	/// コライダーの設定
@@ -449,12 +494,14 @@ protected:
 	void Set(CObjectBase* owner, ELayer layer);
 
 	CBounds mBounds;		// バウンディングボックス
+	CMatrix mLastMtx;		// 前回反映時の行列
 
 private:
 	ELayer mLayer;			// 衝突判定レイヤー
 	EColliderType mType;	// コライダーの種類
 	CObjectBase* mpOwner;	// コライダーの持ち主
 	bool mIsEnable;			// 有効かどうか
+	bool mIsShow;			// デバッグ表示するかどうか
 	bool mIsKinematic;		// 衝突時の押し戻しの影響を受けないかどうか
 	float mWeight;			// コライダーの重量
 	int mCollisionLayers;	// 衝突判定を行うレイヤーのビットフラグ

@@ -151,6 +151,21 @@ public:
 	/// <returns></returns>
 	static CVector Slerp(const CVector& a, const CVector& b, float t);
 
+	/// <summary>
+	/// 2つのベクトルの各軸最小値を求める
+	/// </summary>
+	/// <param name="a">1つ目のベクトル</param>
+	/// <param name="b">2つ目のベクトル</param>
+	/// <returns>各軸の最小値</returns>
+	static CVector Min(const CVector& a, const CVector& b);
+	/// <summary>
+	/// 2つのベクトルの各軸最大値を求める
+	/// </summary>
+	/// <param name="a">1つ目のベクトル</param>
+	/// <param name="b">2つ目のベクトル</param>
+	/// <returns>各軸の最大値</returns>
+	static CVector Max(const CVector& a, const CVector& b);
+
 	// 0ベクトル [0, 0, 0]
 	const static CVector zero;
 	// 1ベクトル [1, 1, 1]
@@ -305,6 +320,21 @@ public:
 	/// <returns>線形補間の結果</returns>
 	static CVector2 LerpUnclamped(const CVector2& a, const CVector2& b, float t);
 
+	/// <summary>
+	/// 2つのベクトルの各軸最小値を求める
+	/// </summary>
+	/// <param name="a">1つ目のベクトル</param>
+	/// <param name="b">2つ目のベクトル</param>
+	/// <returns>各軸の最小値</returns>
+	static CVector2 Min(const CVector2& a, const CVector2& b);
+	/// <summary>
+	/// 2つのベクトルの各軸最大値を求める
+	/// </summary>
+	/// <param name="a">1つ目のベクトル</param>
+	/// <param name="b">2つ目のベクトル</param>
+	/// <returns>各軸の最大値</returns>
+	static CVector2 Max(const CVector2& a, const CVector2& b);
+
 	// 0ベクトル [0, 0]
 	const static CVector2 zero;
 	// 1ベクトル [1, 1]
@@ -395,6 +425,21 @@ public:
 
 	//CVector4 * CMatrix の演算結果を返す
 	CVector4 operator*(const CMatrix& m) const;
+
+	/// <summary>
+	/// 2つのベクトルの各軸最小値を求める
+	/// </summary>
+	/// <param name="a">1つ目のベクトル</param>
+	/// <param name="b">2つ目のベクトル</param>
+	/// <returns>各軸の最小値</returns>
+	static CVector4 Min(const CVector4& a, const CVector4& b);
+	/// <summary>
+	/// 2つのベクトルの各軸最大値を求める
+	/// </summary>
+	/// <param name="a">1つ目のベクトル</param>
+	/// <param name="b">2つ目のベクトル</param>
+	/// <returns>各軸の最大値</returns>
+	static CVector4 Max(const CVector4& a, const CVector4& b);
 
 private:
 	//4Dでの値を設定

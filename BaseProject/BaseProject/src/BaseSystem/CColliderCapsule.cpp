@@ -43,6 +43,7 @@ float CColliderCapsule::Radius() const
 	return mRadius;
 }
 
+#if _DEBUG
 // コライダー描画
 void CColliderCapsule::Render()
 {
@@ -62,12 +63,17 @@ void CColliderCapsule::Render()
 		s, e, mRadius, col
 	);
 }
+#endif
 
 // コライダーの情報を更新
-void CColliderCapsule::UpdateCol()
+void CColliderCapsule::UpdateCol(bool isInit)
 {
-	// 頂点のワールド座標を算出
+	// 前回の更新と同じ行列であれば、処理しない
 	CMatrix m = Matrix();
+	if (!isInit && m == mLastMtx) return;
+	mLastMtx = m;
+
+	// 頂点のワールド座標を算出
 	mWV[0] = mV[0] * m;
 	mWV[1] = mV[1] * m;
 

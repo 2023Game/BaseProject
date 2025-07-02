@@ -37,7 +37,7 @@ public:
 	// 遮蔽物チェックや表示用に、少し上に上げたノードの座標を返す
 	CVector GetOffsetPos() const;
 	// ノードの座標を設定
-	void SetPos(const CVector& pos);
+	void SetPos(const CVector& pos, bool isInit = false);
 
 	// 指定したノードと接続しているか
 	bool IsConnectNode(CNavNode* node) const;

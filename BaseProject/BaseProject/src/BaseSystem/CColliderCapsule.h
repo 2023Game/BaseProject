@@ -42,12 +42,14 @@ public:
 	// カプセルの半径を取得
 	float Radius() const;
 
+#if _DEBUG
 	// コライダー描画
 	void Render() override;
+#endif
 
 protected:
 	// コライダーの情報を更新
-	void UpdateCol() override;
+	void UpdateCol(bool isInit = false) override;
 
 private:
 	CVector mV[2];	// カプセルを構成する線分の頂点配列

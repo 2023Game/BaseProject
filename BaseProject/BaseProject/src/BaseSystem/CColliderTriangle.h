@@ -40,12 +40,14 @@ public:
 	/// <param name="v2">頂点3格納用</param>
 	void Get(CVector* v0, CVector* v1, CVector* v2) const;
 
+#if _DEBUG
 	// コライダー描画
 	void Render() override;
+#endif
 
 protected:
 	// コライダーの情報を更新
-	void UpdateCol() override;
+	void UpdateCol(bool isInit = false) override;
 
 private:
 	CVector mV[3];	// 三角形の頂点の配列

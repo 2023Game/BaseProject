@@ -26,6 +26,7 @@ void CColliderSphere::Get(CVector* pos, float* rad) const
 	*rad = mWRadius;
 }
 
+#if _DEBUG
 void CColliderSphere::Render()
 {
 	// 現在の行列を退避しておく
@@ -65,12 +66,17 @@ void CColliderSphere::Render()
 	// 描画前の行列に戻す
 	glPopMatrix();
 }
+#endif
 
 // コライダーの情報を更新
-void CColliderSphere::UpdateCol()
+void CColliderSphere::UpdateCol(bool isInit)
 {
-	// 行列を反映した中心位置と半径を計算
+	// 前回の更新と同じ行列であれば、処理しない
 	CMatrix m = Matrix();
+	if (!isInit && m == mLastMtx) return;
+	mLastMtx = m;
+
+	// 行列を反映した中心位置と半径を計算
 	mWPos = Position() * m;
 	mWRadius = mRadius * m.VectorX().Length();
 

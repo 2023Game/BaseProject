@@ -4,6 +4,12 @@
 #include "CModel.h"
 #include "CCollider.h"
 
+struct STDivMesh
+{
+	CBounds bounds;
+	std::vector<STVertexData*> vertices;
+};
+
 /*
 モデルデータから三角コライダの生成
 */
@@ -29,17 +35,25 @@ public:
 
 	void Set(CModel* model);
 	const std::vector<STVertexData>& Get() const;
+	const std::vector<STDivMesh>& GetDivMesh() const;
 
+#if _DEBUG
 	// コライダー描画
 	void Render() override;
+	// コライダーのバウンディングボックスを描画
+	void RenderBounds() override;
+	// コライダーの分割範囲を描画
+	void RenderDivArea();
+#endif
 
 protected:
 	// コライダーの情報を更新
-	void UpdateCol() override;
+	void UpdateCol(bool isInit = false) override;
 
 private:
 	//三角コライダの配列作成
 	std::vector<STVertexData> mVertices;
+	std::vector<STDivMesh> mDivMesh;
 	int mDivX;
 	int mDivY;
 	int mDivZ;

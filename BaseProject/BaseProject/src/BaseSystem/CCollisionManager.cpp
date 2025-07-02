@@ -26,6 +26,7 @@ void CCollisionManager::ClearInstance()
 // コンストラクタ
 CCollisionManager::CCollisionManager()
 	: mIsShowCollider(false)
+	, mIsShowColliderBounds(false)
 {
 }
 
@@ -70,12 +71,8 @@ void CCollisionManager::Collision(CCollider* col0, CCollider* col1)
 	if (!col0->IsCollision(col1)) return;
 	if (!col1->IsCollision(col0)) return;
 
-	// どちらのコライダーもメッシュコライダーでなければ、
-	if (col0->mType != EColliderType::eMesh && col1->mType != EColliderType::eMesh)
-	{
-		// バウンディングボックス同士が交差していない場合は、衝突判定を行わない
-		if (!CBounds::Intersect(col0->Bounds(), col1->Bounds())) return;
-	}
+	// バウンディングボックス同士が交差していない場合は、衝突判定を行わない
+	if (!CBounds::Intersect(col0->Bounds(), col1->Bounds())) return;
 
 	// 衝突判定を行う
 	CHitInfo hit;
@@ -144,14 +141,15 @@ void CCollisionManager::CollisionAll()
 	}
 }
 
+#if _DEBUG
 // 全コライダーを描画
 void CCollisionManager::Render()
 {
-#if _DEBUG
 	// 「SHIFT」+「9」でコライダー表示機能オンオフ
 	if (CDebugInput::Key(VK_SHIFT) && CDebugInput::PushKey('9'))
 	{
 		mIsShowCollider = !mIsShowCollider;
+		if (mIsShowCollider) mIsShowColliderBounds = true;
 	}
 	// コライダー表示フラグがオフなら、以降処理しない
 	if (!mIsShowCollider) return;
@@ -159,7 +157,32 @@ void CCollisionManager::Render()
 	// リスト内の全てのコライダーを描画
 	for (auto& col : mColliderList)
 	{
+		if (!col->IsShow()) continue;
 		col->Render();
 	}
-#endif
+
+	// バウンディングボックスを描画
+	RenderBounds();
 }
+
+// 全コライダーのバウンディングボックスを描画
+void CCollisionManager::RenderBounds()
+{
+	// コライダー表示中に「9」を押すと、
+	// コライダーのバウンディングボックス表示機能オンオフ
+	if (mIsShowCollider && CDebugInput::PushKey('9'))
+	{
+		mIsShowColliderBounds = !mIsShowColliderBounds;
+	}
+	// コライダー表示フラグか、
+	// バウンディングボックス表示フラグがオフなら、以降処理しない
+	if (!mIsShowCollider || !mIsShowColliderBounds) return;
+
+	// リスト内の全てのコライダーのバウンディングボックスを描画
+	for (auto& col : mColliderList)
+	{
+		if (!col->IsShow()) continue;
+		col->RenderBounds();
+	}
+}
+#endif

@@ -11,10 +11,12 @@
 // コンストラクタ
 CCollider::CCollider(CObjectBase* owner, ELayer layer, EColliderType type,
 	bool isKinematic, float weight)
-	: mLayer(layer)
+	: mLastMtx(CMatrix::zero)
+	, mLayer(layer)
 	, mType(type)
 	, mpOwner(owner)
 	, mIsEnable(true)
+	, mIsShow(true)
 	, mIsKinematic(isKinematic)
 	, mWeight(weight)
 	, mCollisionLayers(~0)
@@ -68,6 +70,18 @@ void CCollider::SetEnable(bool isEnable)
 bool CCollider::IsEnable() const
 {
 	return mIsEnable;
+}
+
+// コライダーをデバッグ表示するかどうかを設定
+void CCollider::SetShow(bool isShow)
+{
+	mIsShow = isShow;
+}
+
+// コライダーをデバッグ表示するかどうか
+bool CCollider::IsShow() const
+{
+	return mIsShow;
 }
 
 // 衝突時の押し戻しの影響を受けるかどうかを設定
@@ -211,6 +225,73 @@ void CCollider::Update()
 	UpdateCol();
 }
 
+#if _DEBUG
+// コライダーのバウンディングボックスを描画
+void CCollider::RenderBounds()
+{
+	// 現在の行列を退避しておく
+	glPushMatrix();
+
+	// アルファブレンドを有効にする
+	glEnable(GL_BLEND);
+	// ブレンド方法を指定
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// ライトオフ
+	glDisable(GL_LIGHTING);
+
+	// DIFFUSE赤色設定
+	CColor col = CColor::yellow;
+	if (!IsEnable() ||
+		(Owner() != nullptr && !Owner()->IsEnableCol()))
+	{
+		col = CColor::gray;
+	}
+	col.A(0.25f);
+	float* c = (float*)&col;
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, c);
+	glColor4fv(c);
+
+	const CVector& min = mBounds.Min();
+	const CVector& max = mBounds.Max();
+	glBegin(GL_LINES);
+	glVertex3f(min.X(), min.Y(), min.Z());
+	glVertex3f(min.X(), max.Y(), min.Z());
+	glVertex3f(max.X(), min.Y(), min.Z());
+	glVertex3f(max.X(), max.Y(), min.Z());
+	glVertex3f(max.X(), min.Y(), max.Z());
+	glVertex3f(max.X(), max.Y(), max.Z());
+	glVertex3f(min.X(), min.Y(), max.Z());
+	glVertex3f(min.X(), max.Y(), max.Z());
+
+	glVertex3f(min.X(), min.Y(), min.Z());
+	glVertex3f(max.X(), min.Y(), min.Z());
+	glVertex3f(max.X(), min.Y(), min.Z());
+	glVertex3f(max.X(), min.Y(), max.Z());
+	glVertex3f(max.X(), min.Y(), max.Z());
+	glVertex3f(min.X(), min.Y(), max.Z());
+	glVertex3f(min.X(), min.Y(), max.Z());
+	glVertex3f(min.X(), min.Y(), min.Z());
+
+	glVertex3f(min.X(), max.Y(), min.Z());
+	glVertex3f(max.X(), max.Y(), min.Z());
+	glVertex3f(max.X(), max.Y(), min.Z());
+	glVertex3f(max.X(), max.Y(), max.Z());
+	glVertex3f(max.X(), max.Y(), max.Z());
+	glVertex3f(min.X(), max.Y(), max.Z());
+	glVertex3f(min.X(), max.Y(), max.Z());
+	glVertex3f(min.X(), max.Y(), min.Z());
+	glEnd();
+
+	// ライトオン
+	glEnable(GL_LIGHTING);
+	// アルファブレンド無効
+	glDisable(GL_ALPHA);
+
+	// 描画前の行列に戻す
+	glPopMatrix();
+}
+#endif
+
 // 矩形同士の衝突判定
 bool CCollider::CollisionRect(const CRect& rect1, const CRect& rect2)
 {
@@ -274,6 +355,65 @@ bool CCollider::CollisionTriangleLine(
 	//面と線分の交点を求める
 	//交点の計算
 	CVector cross = ls + (le - ls) * (abs(dots) / (abs(dots) + abs(dote)));
+
+	//交点が三角形内なら衝突している
+	if (!IsInsideTriangle(cross, t0, t1, t2, normal))
+	{
+		//三角形外なので、衝突してない
+		h->adjust = CVector(0.0f, 0.0f, 0.0f);
+		return false;
+	}
+
+	//ヒット情報に交点を設定
+	h->cross = cross;
+
+	//調整値計算（衝突しない位置まで戻す）
+	if (dots < 0.0f) {
+		//始点が裏面
+		h->adjust = normal * dots;
+	}
+	else {
+		//終点が裏面
+		h->adjust = normal * dote;
+	}
+	if (!isLeftMain) h->adjust = -h->adjust;
+	return true;
+}
+
+// 三角形とレイの衝突判定
+bool CCollider::CollisionTriangleRay(
+	const CVector& t0, const CVector& t1, const CVector& t2,
+	const CVector& rs, const CVector& re,
+	CHitInfo* h, bool isLeftMain)
+{
+	//面の法線を、外積を正規化して求める
+	CVector normal = CVector::Cross(t1 - t0, t2 - t0).Normalized();
+	//面の法線とレイの向きが同じ方向を向いていたら
+	if (CVector::Dot(normal, re - rs) > 0.0f)
+	{
+		//衝突してない（調整不要）
+		h->adjust = CVector(0.0f, 0.0f, 0.0f);
+		return false;
+	}
+
+	//三角の頂点から線分始点へのベクトルを求める
+	CVector v0sv = rs - t0;
+	//三角の頂点から線分終点へのベクトルを求める
+	CVector v0ev = re - t0;
+	//線分が面と交差しているか内積で確認する
+	float dots = v0sv.Dot(normal);
+	float dote = v0ev.Dot(normal);
+	//プラスは交差してない
+	if (dots * dote >= 0.0f) {
+		//衝突してない（調整不要）
+		h->adjust = CVector(0.0f, 0.0f, 0.0f);
+		return false;
+	}
+
+	//線分は面と交差している
+	//面と線分の交点を求める
+	//交点の計算
+	CVector cross = rs + (re - rs) * (abs(dots) / (abs(dots) + abs(dote)));
 
 	//交点が三角形内なら衝突している
 	if (!IsInsideTriangle(cross, t0, t1, t2, normal))
@@ -745,6 +885,59 @@ bool CCollider::CollisionMeshLine(const std::vector<STVertexData>& tris,
 	return ret;
 }
 
+// メッシュとレイの衝突判定
+bool CCollider::CollisionMeshRay(CColliderMesh* mesh,
+	const CVector& rs, const CVector& re, const CBounds& rb,
+	CHitInfo* hit, bool isLeftMain)
+{
+	bool ret = false;
+	CVector adjust = CVector::zero;
+	float nearDist = -1.0f;
+	CVector start = rs;
+	CVector end = re;
+	CBounds lb = rb;
+	const std::vector<STDivMesh>& divMesh = mesh->GetDivMesh();
+	for (const STDivMesh& dm : divMesh)
+	{
+		if (!CBounds::Intersect(dm.bounds, lb)) continue;
+		for (STVertexData* v: dm.vertices)
+		{
+			if (!CBounds::Intersect(v->bounds, lb)) continue;
+			if (CollisionTriangleRay(v->wv.V[0], v->wv.V[1], v->wv.V[2], start, end, hit, isLeftMain))
+			{
+				hit->tris.push_back(v->wv);
+
+				CVector adj = hit->adjust;
+				adjust.X(abs(adjust.X()) > abs(adj.X()) ? adjust.X() : adj.X());
+				adjust.Y(abs(adjust.Y()) > abs(adj.Y()) ? adjust.Y() : adj.Y());
+				adjust.Z(abs(adjust.Z()) > abs(adj.Z()) ? adjust.Z() : adj.Z());
+
+				if (nearDist < 0.0f)
+				{
+					end = hit->cross;
+					nearDist = (end - start).LengthSqr();
+					lb = CBounds::GetLineBounds(start, end);
+				}
+				else
+				{
+					float dist = (end - start).LengthSqr();
+					if (dist < nearDist)
+					{
+						end = hit->cross;
+						nearDist = dist;
+					}
+				}
+
+				ret = true;
+			}
+		}
+	}
+	hit->adjust = adjust;
+	hit->cross = end;
+	hit->dist = sqrtf(nearDist);
+	return ret;
+}
+
 // メッシュと球の衝突判定
 bool CCollider::CollisionMeshSpehre(const std::vector<STVertexData>& tris,
 	CColliderSphere* sphereCol, CHitInfo* hit, bool isLeftMain)
@@ -1150,6 +1343,9 @@ bool CCollider::CollisionRay(CCollider* c, const CVector& start, const CVector& 
 	// レイの長さが0ならば、衝突していない
 	CVector v = end - start;
 	if (v.LengthSqr() == 0.0f) return false;
+	// コライダーとレイのバウンディングボックスが重なってなければ、衝突しない
+	CBounds lb = CBounds::GetLineBounds(start, end);
+	if (!CBounds::Intersect(c->Bounds(), lb)) return false;
 
 	// コライダーの種類によって衝突判定を切り替える
 	switch (c->Type())
@@ -1177,15 +1373,14 @@ bool CCollider::CollisionRay(CCollider* c, const CVector& start, const CVector& 
 		CColliderTriangle* triangle = dynamic_cast<CColliderTriangle*>(c);
 		CVector t0, t1, t2;
 		triangle->Get(&t0, &t1, &t2);
-		return CollisionTriangleLine(t0, t1, t2, start, end, hit, false);
+		return CollisionTriangleRay(t0, t1, t2, start, end, hit, false);
 	}
 	// メッシュコライダーとの衝突
 	case EColliderType::eMesh:
 	{
 		CColliderMesh* mesh = dynamic_cast<CColliderMesh*>(c);
-		auto tris = mesh->Get();
 		CBounds bounds = CBounds::GetLineBounds(start, end);
-		return CollisionMeshLine(tris, start, end, bounds, hit, false);
+		return CollisionMeshRay(mesh, start, end, bounds, hit, false);
 	}
 	}
 

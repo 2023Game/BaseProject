@@ -72,6 +72,30 @@ void CMatrix::operator+=(const CMatrix &m)
 	}
 }
 
+bool CMatrix::operator==(const CMatrix& m) const
+{
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			if (mM[i][j] != m.mM[i][j]) return false;
+		}
+	}
+	return true;
+}
+
+bool CMatrix::operator!=(const CMatrix& m) const
+{
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			if (mM[i][j] != m.mM[i][j]) return true;
+		}
+	}
+	return false;
+}
+
 //クオータニオンで回転行列を設定する
 CMatrix CMatrix::Quaternion(float x, float y, float z, float w)
 {

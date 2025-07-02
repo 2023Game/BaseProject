@@ -39,12 +39,14 @@ public:
 
 	float Radius() const;
 
+#if _DEBUG
 	// コライダー描画
 	void Render() override;
+#endif
 
 protected:
 	// コライダーの情報を更新
-	void UpdateCol() override;
+	void UpdateCol(bool isInit = false) override;
 
 private:
 	CVector mV[2];	// 線分の頂点の配列
