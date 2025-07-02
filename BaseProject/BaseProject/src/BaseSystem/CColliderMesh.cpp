@@ -1,4 +1,5 @@
 #include "CColliderMesh.h"
+#include "Primitive.h"
 
 CColliderMesh::CColliderMesh(CObjectBase* owner, ELayer layer, CModel* model,
 	bool isKinematic, float weight, int divX, int divY, int divZ)
@@ -156,77 +157,60 @@ void CColliderMesh::Render()
 void CColliderMesh::RenderBounds()
 {
 	CCollider::RenderBounds();
+	RenderDivArea();
 
-	if (mDivMesh.size() == 1) return;
+	//if (mDivMesh.size() == 1) return;
 
-	// 現在の行列を退避しておく
-	glPushMatrix();
-
-	// アルファブレンドを有効にする
-	glEnable(GL_BLEND);
-	// ブレンド方法を指定
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	// ライトオフ
-	glDisable(GL_LIGHTING);
-
-	// DIFFUSE赤色設定
-	CColor col = CColor::green;
-	if (!IsEnable() ||
-		(Owner() != nullptr && !Owner()->IsEnableCol()))
-	{
-		col = CColor::gray;
-	}
-	col.A(0.35f);
-	float* c = (float*)&col;
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, c);
-	glColor4fv(c);
-
-	for (STDivMesh& divMesh : mDivMesh)
-	{
-		const CVector& min = divMesh.bounds.Min();
-		const CVector& max = divMesh.bounds.Max();
-		// 三角形を描画
-		glBegin(GL_LINES);
-		glVertex3f(min.X(), min.Y(), min.Z());
-		glVertex3f(min.X(), max.Y(), min.Z());
-		glVertex3f(max.X(), min.Y(), min.Z());
-		glVertex3f(max.X(), max.Y(), min.Z());
-		glVertex3f(max.X(), min.Y(), max.Z());
-		glVertex3f(max.X(), max.Y(), max.Z());
-		glVertex3f(min.X(), min.Y(), max.Z());
-		glVertex3f(min.X(), max.Y(), max.Z());
-
-		glVertex3f(min.X(), min.Y(), min.Z());
-		glVertex3f(max.X(), min.Y(), min.Z());
-		glVertex3f(max.X(), min.Y(), min.Z());
-		glVertex3f(max.X(), min.Y(), max.Z());
-		glVertex3f(max.X(), min.Y(), max.Z());
-		glVertex3f(min.X(), min.Y(), max.Z());
-		glVertex3f(min.X(), min.Y(), max.Z());
-		glVertex3f(min.X(), min.Y(), min.Z());
-
-		glVertex3f(min.X(), max.Y(), min.Z());
-		glVertex3f(max.X(), max.Y(), min.Z());
-		glVertex3f(max.X(), max.Y(), min.Z());
-		glVertex3f(max.X(), max.Y(), max.Z());
-		glVertex3f(max.X(), max.Y(), max.Z());
-		glVertex3f(min.X(), max.Y(), max.Z());
-		glVertex3f(min.X(), max.Y(), max.Z());
-		glVertex3f(min.X(), max.Y(), min.Z());
-		glEnd();
-	}
-
-	// ライトオン
-	glEnable(GL_LIGHTING);
-	// アルファブレンド無効
-	glDisable(GL_ALPHA);
-
-	// 描画前の行列に戻す
-	glPopMatrix();
+	//CColor col = CColor::green;
+	//if (!IsEnable() ||
+	//	(Owner() != nullptr && !Owner()->IsEnableCol()))
+	//{
+	//	col = CColor::gray;
+	//}
+	//col.A(0.35f);
+	//for (STDivMesh& divMesh : mDivMesh)
+	//{
+	//	Primitive::DrawWireBox
+	//	(
+	//		divMesh.bounds.Center(), divMesh.bounds.Size(),
+	//		col, EBlend::eAlpha
+	//	);
+	//}
 }
 
 void CColliderMesh::RenderDivArea()
 {
+	int divCnt = mDivX * mDivY * mDivZ;
+	if (divCnt <= 1) return;
+
+	CColor col = CColor::green;
+	col.A(0.35f);
+	CVector start = mBounds.Min();
+	CVector size = mBounds.Size();
+	CVector min, max;
+	for (int x = 0; x < mDivX; x++)
+	{
+		min.X(start.X() + size.X() * ((float)x / mDivX));
+		max.X(start.X() + size.X() * ((float)(x + 1) / mDivX));
+		for (int y = 0; y < mDivY; y++)
+		{
+			min.Y(start.Y() + size.Y() * ((float)y / mDivY));
+			max.Y(start.Y() + size.Y() * ((float)(y + 1) / mDivY));
+			for (int z = 0; z < mDivZ; z++)
+			{
+				min.Z(start.Z() + size.Z() * ((float)z / mDivZ));
+				max.Z(start.Z() + size.Z() * ((float)(z + 1) / mDivZ));
+
+				CVector center = (min + max) * 0.5f;
+				CVector size2 = max - min;
+				Primitive::DrawWireBox
+				(
+					center, size2,
+					col, EBlend::eAlpha
+				);
+			}
+		}
+	}
 }
 #endif
 

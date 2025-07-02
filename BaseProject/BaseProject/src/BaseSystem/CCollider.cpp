@@ -7,6 +7,7 @@
 #include "CColliderMesh.h"
 #include "CObjectBase.h"
 #include "Maths.h"
+#include "Primitive.h"
 
 // コンストラクタ
 CCollider::CCollider(CObjectBase* owner, ELayer layer, EColliderType type,
@@ -229,17 +230,6 @@ void CCollider::Update()
 // コライダーのバウンディングボックスを描画
 void CCollider::RenderBounds()
 {
-	// 現在の行列を退避しておく
-	glPushMatrix();
-
-	// アルファブレンドを有効にする
-	glEnable(GL_BLEND);
-	// ブレンド方法を指定
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	// ライトオフ
-	glDisable(GL_LIGHTING);
-
-	// DIFFUSE赤色設定
 	CColor col = CColor::yellow;
 	if (!IsEnable() ||
 		(Owner() != nullptr && !Owner()->IsEnableCol()))
@@ -247,48 +237,11 @@ void CCollider::RenderBounds()
 		col = CColor::gray;
 	}
 	col.A(0.25f);
-	float* c = (float*)&col;
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, c);
-	glColor4fv(c);
-
-	const CVector& min = mBounds.Min();
-	const CVector& max = mBounds.Max();
-	glBegin(GL_LINES);
-	glVertex3f(min.X(), min.Y(), min.Z());
-	glVertex3f(min.X(), max.Y(), min.Z());
-	glVertex3f(max.X(), min.Y(), min.Z());
-	glVertex3f(max.X(), max.Y(), min.Z());
-	glVertex3f(max.X(), min.Y(), max.Z());
-	glVertex3f(max.X(), max.Y(), max.Z());
-	glVertex3f(min.X(), min.Y(), max.Z());
-	glVertex3f(min.X(), max.Y(), max.Z());
-
-	glVertex3f(min.X(), min.Y(), min.Z());
-	glVertex3f(max.X(), min.Y(), min.Z());
-	glVertex3f(max.X(), min.Y(), min.Z());
-	glVertex3f(max.X(), min.Y(), max.Z());
-	glVertex3f(max.X(), min.Y(), max.Z());
-	glVertex3f(min.X(), min.Y(), max.Z());
-	glVertex3f(min.X(), min.Y(), max.Z());
-	glVertex3f(min.X(), min.Y(), min.Z());
-
-	glVertex3f(min.X(), max.Y(), min.Z());
-	glVertex3f(max.X(), max.Y(), min.Z());
-	glVertex3f(max.X(), max.Y(), min.Z());
-	glVertex3f(max.X(), max.Y(), max.Z());
-	glVertex3f(max.X(), max.Y(), max.Z());
-	glVertex3f(min.X(), max.Y(), max.Z());
-	glVertex3f(min.X(), max.Y(), max.Z());
-	glVertex3f(min.X(), max.Y(), min.Z());
-	glEnd();
-
-	// ライトオン
-	glEnable(GL_LIGHTING);
-	// アルファブレンド無効
-	glDisable(GL_ALPHA);
-
-	// 描画前の行列に戻す
-	glPopMatrix();
+	Primitive::DrawWireBox
+	(
+		mBounds.Center(), mBounds.Size(),
+		col, EBlend::eAlpha
+	);
 }
 #endif
 
@@ -900,7 +853,7 @@ bool CCollider::CollisionMeshRay(CColliderMesh* mesh,
 	for (const STDivMesh& dm : divMesh)
 	{
 		if (!CBounds::Intersect(dm.bounds, lb)) continue;
-		for (STVertexData* v: dm.vertices)
+		for (STVertexData* v : dm.vertices)
 		{
 			if (!CBounds::Intersect(v->bounds, lb)) continue;
 			if (CollisionTriangleRay(v->wv.V[0], v->wv.V[1], v->wv.V[2], start, end, hit, isLeftMain))
