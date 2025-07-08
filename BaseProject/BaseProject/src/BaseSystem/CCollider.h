@@ -158,7 +158,7 @@ public:
 	CMatrix Matrix() const;
 
 	// バウンディングボックスを取得
-	CBounds Bounds() const;
+	const CBounds& Bounds() const;
 
 	// コライダー更新
 	void Update();

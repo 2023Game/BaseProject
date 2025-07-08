@@ -207,7 +207,7 @@ CMatrix CCollider::Matrix() const
 }
 
 // バウンディングボックスを取得
-CBounds CCollider::Bounds() const
+const CBounds& CCollider::Bounds() const
 {
 	return mBounds;
 }
