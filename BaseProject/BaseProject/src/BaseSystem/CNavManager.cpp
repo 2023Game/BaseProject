@@ -104,6 +104,7 @@ void CNavManager::FindConnectNavNodes(CNavNode* node, float distance)
 	mNextFindNodeIndex = 0;
 
 	mpUpdateNode->ClearConnects();
+	mpUpdateNode->StartUpdateConnectNode();
 }
 
 // 接続できるノードかどうか
@@ -313,10 +314,14 @@ void CNavManager::UpdateConnectNavNode()
 	if (mNextFindNodeIndex >= nodeCount)
 	{
 		// 接続ノード更新処理が終わったことをノードに伝える
-		mpUpdateNode->UpdatedConnectNode();
+		mpUpdateNode->EndUpdateConnectNode();
 
 		// 更新待ちリストから取り除く
 		RemoveUpdateConnectNavNode(mpUpdateNode);
+
+		// ノードの更新が終わったタイミングでも、
+		// 削除フラグが立ったノードを削除する
+		CheckKillNode();
 
 		// 更新待ちリストに更新待ちのノードが存在したら
 		if (mUpdateConnectNodes.size() > 0)
@@ -328,6 +333,7 @@ void CNavManager::UpdateConnectNavNode()
 			mNextFindNodeIndex = 0;
 
 			mpUpdateNode->ClearConnects();
+			mpUpdateNode->StartUpdateConnectNode();
 		}
 		// 更新待ちノードが存在しない
 		else
@@ -362,6 +368,13 @@ void CNavManager::CheckKillNode()
 // 全てのノードを更新
 void CNavManager::Update()
 {
+	// 更新中のノードがなければ、
+	// 削除フラグが立っているノードを削除
+	if (mpUpdateNode != nullptr)
+	{
+		CheckKillNode();
+	}
+
 	// リスト内のノード全て更新
 	for (CNavNode* node : mNodes)
 	{

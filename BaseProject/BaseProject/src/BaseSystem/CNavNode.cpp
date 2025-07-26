@@ -287,14 +287,20 @@ void CNavNode::UpdateConnectNode(bool immediate)
 	{
 		if (mIsUpdaingConnectNode) return;
 		navMgr->FindConnectNavNodes(this, FIND_NODE_DISTANCE);
-		mIsUpdaingConnectNode = true;
 	}
 
 	mIsUpdateConnectNode = false;
 }
 
+
+// 接続ノードの更新開始時の呼び出す
+void CNavNode::StartUpdateConnectNode()
+{
+	mIsUpdaingConnectNode = true;
+}
+
 // 接続ノードの更新終了時の呼び出す
-void CNavNode::UpdatedConnectNode()
+void CNavNode::EndUpdateConnectNode()
 {
 	mIsUpdaingConnectNode = false;
 }

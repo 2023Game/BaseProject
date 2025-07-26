@@ -90,8 +90,10 @@ private:
 	// 最短経路計算用のデータをリセット
 	void ResetCalcData();
 
+	// 接続ノードの更新開始時の呼び出す
+	void StartUpdateConnectNode();
 	// 接続ノードの更新終了時の呼び出す
-	void UpdatedConnectNode();
+	void EndUpdateConnectNode();
 
 	// ノードが有効かどうか
 	bool mIsEnable;
