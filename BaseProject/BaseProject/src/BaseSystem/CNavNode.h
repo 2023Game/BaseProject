@@ -24,13 +24,16 @@ class CNavNode
 public:
 	// コンストラクタ
 	CNavNode(const CVector& pos, bool isDestNode = false);
-	// デストラクタ
-	~CNavNode();
 
 	// 有効状態を設定
 	void SetEnable(bool enable);
 	// 現在有効かどうか
 	bool IsEnable() const;
+
+	// 削除する
+	void Kill();
+	// 削除するかどうか
+	bool IsKill() const;
 
 	// ノードの座標を取得
 	const CVector& GetPos() const;
@@ -69,19 +72,31 @@ public:
 	bool IsBlockedNode(CNavNode* node) const;
 
 	// 接続しているノードを更新
-	void UpdateConnectNode();
+	void UpdateConnectNode(bool immediate = false);
+	// ノード更新中か
+	bool IsUpdaing() const;
 
 	// ノードの色設定（デバッグ用）
 	void SetColor(const CColor& color);
+	// ノードを更新
+	void Update();
 	// ノードを描画（デバッグ用）
 	void Render();
-	
+
 private:
+	// デストラクタ
+	~CNavNode();
+
 	// 最短経路計算用のデータをリセット
 	void ResetCalcData();
 
+	// 接続ノードの更新終了時の呼び出す
+	void UpdatedConnectNode();
+
 	// ノードが有効かどうか
 	bool mIsEnable;
+	// 削除するかどうか
+	bool mIsKill;
 
 	// 経路探索時に経由できない目的地専用のノードかどうか
 	bool mIsDestNode;
@@ -96,6 +111,8 @@ private:
 	// 最短経路計算時に記憶しておく情報
 	float mCalcMoveCost;		// 開始ノードからこのノードまでに掛かった移動コスト
 	CNavNode* mpCalcFromNode;	// 最短経路での前のノードのポインタ
+	bool mIsUpdateConnectNode;	// 接続ノードを更新する必要があるか
+	bool mIsUpdaingConnectNode;	// 接続ノードを更新中か
 
 	// デバッグ関連
 	CColor mColor;		// ノードの色

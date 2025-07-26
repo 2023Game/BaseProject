@@ -28,7 +28,15 @@ public:
 	/// <param name="node">接続できるノードを検索するノード</param>
 	/// <param name="distance">接続できる距離の限界値</param>
 	/// <returns>接続したノードの数</returns>
-	int FindConnectNavNodes(CNavNode* node, float distance);
+	void FindConnectNavNodes(CNavNode* node, float distance);
+
+	/// <summary>
+	/// 指定したノードに接続できるノードを検索して設定（即時検索版）
+	/// </summary>
+	/// <param name="node">接続できるノードを検索するノード</param>
+	/// <param name="distance">接続できる距離の限界値</param>
+	/// <returns>接続したノードの数</returns>
+	int FindConnectNavNodesImmediate(CNavNode* node, float distance);
 
 	/// <summary>
 	/// 指定した開始ノードから目的地ノードまでの最短経路を求める
@@ -57,6 +65,8 @@ public:
 	/// <param name="col"></param>
 	void RemoveCollider(CCollider* col);
 
+	// 全てのノードを更新
+	void Update() override;
 	// 全てのノードと経路を描画
 	void Render() override;
 
@@ -69,6 +79,19 @@ private:
 	/// <param name="node">移動コストを計算する開始ノード</param>
 	/// <param name="goal">目的地のノード</param>
 	void CalcNextMoveCost(CNavNode* node, CNavNode* goal);
+	// 接続できるノードかどうか
+	bool CanConnectNavNode(CNavNode* node, CNavNode* other, float distance) const;
+
+	// 指定したノードを接続状態の更新待ちリストに追加
+	void AddUpdateConnectNavNode(CNavNode* node, float distance);
+	// 指定したノードを接続状態の更新待ちリストから取り除く
+	void RemoveUpdateConnectNavNode(CNavNode* node);
+
+	// 接続ノードを更新
+	void UpdateConnectNavNode();
+
+	// 削除するノードを調べる
+	void CheckKillNode();
 
 	// 経路管理クラスのインスタンスへのポインタ
 	static CNavManager* spInstance;
@@ -83,4 +106,19 @@ private:
 
 	// 遮蔽物チェックに使用するコライダーのリスト
 	std::vector<CCollider*> mColliders;
+
+	// 現在更新中のノード
+	CNavNode* mpUpdateNode;
+	float mFindNodeDistance;
+	// 次の接続しているか調べるノードのインデックス値
+	int mNextFindNodeIndex;
+
+	// 接続状態更新ノードのデータ
+	struct UpdateConnectNodeData
+	{
+		CNavNode* node;	// 更新するノード
+		float distance;	// 判定するノード間の距離
+	};
+	// 接続状態の更新待ちリスト
+	std::vector<UpdateConnectNodeData> mUpdateConnectNodes;
 };

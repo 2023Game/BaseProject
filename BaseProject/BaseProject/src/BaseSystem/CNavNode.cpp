@@ -6,14 +6,19 @@
 #define NODE_OFFSET_Y 5.0f
 // 探すノードの距離の限界値
 #define FIND_NODE_DISTANCE 180.0f
+// ノードの位置を更新する距離
+#define UPDATE_DISTANCE 1.0f
 
 // コンストラクタ
 CNavNode::CNavNode(const CVector& pos, bool isDestNode)
 	: mIsEnable(true)
+	, mIsKill(false)
 	, mIsDestNode(isDestNode)
 	, mPosition(pos)
 	, mCalcMoveCost(-1.0f)
 	, mpCalcFromNode(nullptr)
+	, mIsUpdateConnectNode(false)
+	, mIsUpdaingConnectNode(false)
 	, mColor(0.0f, 1.0f, 0.0f, 1.0f)
 {
 	// 管理クラスのリストに自身を追加
@@ -32,14 +37,6 @@ CNavNode::~CNavNode()
 {
 	// 探索ノードを削除する前に、自身と接続しているノードを取り除く
 	ClearConnects(true);
-
-	// 管理クラスのリストから自身を取り除く
-	// 管理クラスのリストに自身を追加
-	CNavManager* navMgr = CNavManager::Instance();
-	if (navMgr != nullptr)
-	{
-		navMgr->RemoveNode(this);
-	}
 }
 
 // 有効状態を設定
@@ -49,9 +46,21 @@ void CNavNode::SetEnable(bool enable)
 }
 
 // 現在有効かどうか
-bool CNavNode::IsEnable() const 
+bool CNavNode::IsEnable() const
 {
 	return mIsEnable;
+}
+
+// 削除する
+void CNavNode::Kill()
+{
+	mIsKill = true;
+}
+
+// 削除するかどうか
+bool CNavNode::IsKill() const
+{
+	return mIsKill;
 }
 
 // 最短経路計算用のデータをリセット
@@ -60,7 +69,6 @@ void CNavNode::ResetCalcData()
 	mCalcMoveCost = -1.0;
 	mpCalcFromNode = nullptr;
 }
-
 
 // ノードの座標を取得
 const CVector& CNavNode::GetPos() const
@@ -78,14 +86,31 @@ CVector CNavNode::GetOffsetPos() const
 // ノードの座標を設定
 void CNavNode::SetPos(const CVector& pos, bool isInit)
 {
-	// 位置が変わってなければ、設定しない
-	if (!isInit && pos == mPosition) return;
+	// 初期化時でなければ
+	if (!isInit)
+	{
+		// 位置が変わってなければ、更新しない
+		if (pos == mPosition) return;
+
+		// ノードの位置の変化が更新する距離より短い場合は、更新しない
+		float dist = (pos - mPosition).LengthSqr();
+		if (dist < UPDATE_DISTANCE * UPDATE_DISTANCE) return;
+	}
 
 	// ノードの座標を更新
 	mPosition = pos;
 
-	// 座標を変更したので、接続ノードを再検索
-	UpdateConnectNode();
+	// 初期化時は、即時接続ノードを更新
+	if (isInit)
+	{
+		UpdateConnectNode(true);
+	}
+	// それ以降は、更新できるタイミングに更新
+	else
+	{
+		// 接続ノード更新フラグを立てる
+		mIsUpdateConnectNode = true;
+	}
 }
 
 // 指定したノードと接続しているか
@@ -249,19 +274,51 @@ bool CNavNode::IsBlockedNode(CNavNode* node) const
 }
 
 // 接続しているノードを更新
-void CNavNode::UpdateConnectNode()
+void CNavNode::UpdateConnectNode(bool immediate)
 {
 	CNavManager* navMgr = CNavManager::Instance();
-	if (navMgr != nullptr)
+	if (navMgr == nullptr) return;
+
+	if (immediate)
 	{
-		navMgr->FindConnectNavNodes(this, FIND_NODE_DISTANCE);
+		navMgr->FindConnectNavNodesImmediate(this, FIND_NODE_DISTANCE);
 	}
+	else
+	{
+		if (mIsUpdaingConnectNode) return;
+		navMgr->FindConnectNavNodes(this, FIND_NODE_DISTANCE);
+		mIsUpdaingConnectNode = true;
+	}
+
+	mIsUpdateConnectNode = false;
+}
+
+// 接続ノードの更新終了時の呼び出す
+void CNavNode::UpdatedConnectNode()
+{
+	mIsUpdaingConnectNode = false;
+}
+
+// ノード更新中か
+bool CNavNode::IsUpdaing() const
+{
+	return mIsUpdaingConnectNode;
 }
 
 // ノードの色設定（デバッグ用）
 void CNavNode::SetColor(const CColor& color)
 {
 	mColor.Set(color.R(), color.G(), color.B());
+}
+
+// ノードを更新
+void CNavNode::Update()
+{
+	// 接続ノード更新フラグが立っていたら、更新
+	if (mIsUpdateConnectNode)
+	{
+		UpdateConnectNode();
+	}
 }
 
 // ノードを描画（デバッグ用）
