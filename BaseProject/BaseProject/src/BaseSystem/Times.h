@@ -10,4 +10,6 @@ namespace Times
 	float FPS();
 	// 前回のフレームの経過時間を取得
 	float DeltaTime();
+	// ゲーム起動してからの時間を取得
+	float Time();
 }

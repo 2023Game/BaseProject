@@ -11,6 +11,8 @@
 int gFPS = 60;
 // 前回のフレームの経過時間
 float gDeltaTime = 0.0f;
+// ゲーム開始時の時間
+LARGE_INTEGER start_time;
 
 CApplication gApplication;
 
@@ -84,7 +86,7 @@ void idle() {
 	if (last_time.QuadPart == 0) {
 		QueryPerformanceCounter(&last_time);
 	}
-	do{
+	do {
 		//現在のシステムのカウント数を取得
 		QueryPerformanceCounter(&time);
 
@@ -152,9 +154,12 @@ int main(void)
 	//固定シェーダー用
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-	float lightPosition[] = {0.0f, 100.0f, 100.0f, 1.0f};
+	float lightPosition[] = { 0.0f, 100.0f, 100.0f, 1.0f };
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 	glEnable(GL_NORMALIZE);
+
+	// ゲーム開始時の時間を記憶しておく
+	QueryPerformanceCounter(&start_time);
 
 	//初期処理
 	gApplication.Start();
@@ -209,4 +214,13 @@ float Times::FPS()
 float Times::DeltaTime()
 {
 	return gDeltaTime;
+}
+
+// ゲーム起動してからの時間を取得
+float Times::Time()
+{
+	LARGE_INTEGER freq, time;
+	QueryPerformanceFrequency(&freq);
+	QueryPerformanceCounter(&time);
+	return (float)(time.QuadPart - start_time.QuadPart) / freq.QuadPart;
 }
