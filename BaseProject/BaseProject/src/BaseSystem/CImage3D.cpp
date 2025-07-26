@@ -215,33 +215,34 @@ void CImage3D::SetLighting(bool enable)
 void CImage3D::ApplyVertices()
 {
 	CVector s = mSize * (1.0f / mWolrdUnitPerPixel) * 2.0f;
+	CVector hs = s * 0.5f;
 
 	CVector start = CVector::zero;
 
-	if (mAlignment == EAlignment::eUpperLeft)			start = CVector(0.0f,			0.0f,			0.0f);
-	else if (mAlignment == EAlignment::eUpperCenter)	start = CVector(-s.X() * 0.5f,	0.0f,			0.0f);
-	else if (mAlignment == EAlignment::eUpperRight)		start = CVector(-s.X(),			0.0f,			0.0f);
+	if (mAlignment == EAlignment::eUpperLeft)			start = CVector(0.0f,		0.0f,		0.0f);
+	else if (mAlignment == EAlignment::eUpperCenter)	start = CVector(-hs.X(),	0.0f,		0.0f);
+	else if (mAlignment == EAlignment::eUpperRight)		start = CVector(-s.X(),		0.0f,		0.0f);
 
-	else if (mAlignment == EAlignment::eMiddleLeft)		start = CVector(0.0f,			-s.Y() * 0.5f,	0.0f);
-	else if (mAlignment == EAlignment::eMiddleCenter)	start = CVector(-s.X() * 0.5f,	-s.Y() * 0.5f,	0.0f);
-	else if (mAlignment == EAlignment::eMiddleRight)	start = CVector(-s.X(),			-s.Y() * 0.5f,	0.0f);
+	else if (mAlignment == EAlignment::eMiddleLeft)		start = CVector(0.0f,		-hs.Y(),	0.0f);
+	else if (mAlignment == EAlignment::eMiddleCenter)	start = CVector(-hs.X(),	-hs.Y(),	0.0f);
+	else if (mAlignment == EAlignment::eMiddleRight)	start = CVector(-s.X(),		-hs.Y(),	0.0f);
 
-	else if (mAlignment == EAlignment::eLowerLeft)		start = CVector(0.0f,			-s.Y(),			0.0f);
-	else if (mAlignment == EAlignment::eLowerCenter)	start = CVector(-s.X() * 0.5f,	-s.Y(),			0.0f);
-	else if (mAlignment == EAlignment::eLowerRight)		start = CVector(-s.X(),			-s.Y(),			0.0f);
+	else if (mAlignment == EAlignment::eLowerLeft)		start = CVector(0.0f,		-s.Y(),		0.0f);
+	else if (mAlignment == EAlignment::eLowerCenter)	start = CVector(-hs.X(),	-s.Y(),		0.0f);
+	else if (mAlignment == EAlignment::eLowerRight)		start = CVector(-s.X(),		-s.Y(),		0.0f);
 
 	// 三角形の頂点座標設定
 	mT[0].Vertex
 	(
-		start + CVector(s.X(),	s.Y(),	0.0f),
-		start + CVector(0.0f,	0.0f,	0.0f),
-		start + CVector(s.X(),	0.0f,	0.0f)
+		start + CVector(s.X(), s.Y(), 0.0f),
+		start + CVector(0.0f, 0.0f, 0.0f),
+		start + CVector(s.X(), 0.0f, 0.0f)
 	);
 	mT[1].Vertex
 	(
-		start + CVector(0.0f,	s.Y(),	0.0f),
-		start + CVector(0.0f,	0.0f,	0.0f),
-		start + CVector(s.X(),	s.Y(),	0.0f)
+		start + CVector(0.0f, s.Y(), 0.0f),
+		start + CVector(0.0f, 0.0f, 0.0f),
+		start + CVector(s.X(), s.Y(), 0.0f)
 	);
 
 	// 法線をZ軸方向
@@ -314,8 +315,8 @@ void CImage3D::Render(CMaterial* mpMaterial)
 	// 行列の保存
 	glPushMatrix();
 
-	// 自身の行列を取得
-	CMatrix m = Matrix();
+	// 自身の行列
+	CMatrix m;
 
 	// ビルボードが有効ならば
 	if (mIsBillboard)
@@ -324,7 +325,17 @@ void CImage3D::Render(CMaterial* mpMaterial)
 		CCamera* cam = CCamera::CurrentCamera();
 		CMatrix camMtx = cam->GetViewMatrix().Inverse();
 		camMtx.Position(CVector::zero);
-		m = camMtx * m;
+		CMatrix s, r, t;
+		s.Scale(mScale);
+		r = mRotation.Matrix();
+		t.Translate(mPosition);
+		m = s * r * camMtx * t;
+	}
+	// ビルボードが無効ならば
+	else
+	{
+		// 通常の行列を取得
+		m = Matrix();
 	}
 
 	// 行列を反映
@@ -336,7 +347,7 @@ void CImage3D::Render(CMaterial* mpMaterial)
 
 	// 各設定のフラグの状態に合わせて、オフにする
 	if (!mIsDepthTest) glDisable(GL_DEPTH_TEST);	// デプステスト
-	if (!mIsDepthMask) glDepthMask(false);		// デプス書き込み
+	if (!mIsDepthMask) glDepthMask(false);			// デプス書き込み
 	if (!mIsLighting) glDisable(GL_LIGHTING);		// ライティング
 
 	// マテリアル適用
