@@ -298,6 +298,7 @@ void CNavManager::UpdateConnectNavNode()
 	int nodeCount = mNodes.size();
 	for (int i = 0; i < FIND_CONNECT_NODE_COUNT; i++)
 	{
+		if (mNextFindNodeIndex >= nodeCount) break;
 		CNavNode* findNode = mNodes[mNextFindNodeIndex];
 		// 接続できるノードであれば、リストに追加
 		if (CanConnectNavNode(mpUpdateNode, findNode, mFindNodeDistance))
@@ -307,7 +308,6 @@ void CNavManager::UpdateConnectNavNode()
 
 		// 次のノードを調べる
 		mNextFindNodeIndex++;
-		if (mNextFindNodeIndex >= nodeCount) break;
 	}
 
 	// 最後まで調べたか
