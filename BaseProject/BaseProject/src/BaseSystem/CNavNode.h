@@ -74,7 +74,7 @@ public:
 	// 接続しているノードを更新
 	void UpdateConnectNode(bool immediate = false);
 	// ノード更新中か
-	bool IsUpdaing() const;
+	bool IsUpdating() const;
 
 	// ノードの色設定（デバッグ用）
 	void SetColor(const CColor& color);

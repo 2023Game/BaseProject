@@ -4,6 +4,7 @@
 
 GLFWwindow* CInput::spWindow = nullptr;	// ウィンドウのポインタ
 std::map<int, int> CInput::msInputBits;	// キーの入力状態を管理するリスト
+bool CInput::msIsShowCursor = true;		// マウスカーソルを表示するか
 CVector2 CInput::msMousePos = CVector2(0.0f, 0.0f);	// 現在のマウス座標
 CVector2 CInput::msLastMousePos = CVector2(0.0f, 0.0f);	// 前回のマウス座標
 int CInput::msMouseWheel = 0;		// マウスホイールの回転量
@@ -90,17 +91,24 @@ bool CInput::PullKey(int key)
 // マウスカーソルの表示設定
 void CInput::ShowCursor(bool isShow)
 {
-	glfwSetInputMode
-	(
-		spWindow,
-		GLFW_CURSOR,
-		isShow ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED
-	);
+	msIsShowCursor = isShow;
 }
 
 // キーの入力状態を更新
 void CInput::Update()
 {
+	int mode = glfwGetInputMode(spWindow, GLFW_CURSOR);
+	if (msIsShowCursor && mode == GLFW_CURSOR_DISABLED ||
+		!msIsShowCursor && mode == GLFW_CURSOR_NORMAL)
+	{
+		glfwSetInputMode
+		(
+			spWindow,
+			GLFW_CURSOR,
+			msIsShowCursor ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED
+		);
+	}
+
 	auto itBegin = msInputBits.begin();
 	auto itEnd = msInputBits.end();
 	for (auto it = itBegin; it != itEnd; ++it)

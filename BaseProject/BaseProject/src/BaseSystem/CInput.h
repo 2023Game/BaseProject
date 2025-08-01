@@ -83,6 +83,8 @@ private:
 	};
 	// キーの入力状態を管理するリスト
 	static std::map<int, int> msInputBits;
+	// マウスカーソルを表示するか
+	static bool msIsShowCursor;
 	// 現在のマウス座標
 	static CVector2 msMousePos;
 	// 前回のマウス座標
