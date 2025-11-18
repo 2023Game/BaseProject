@@ -377,8 +377,9 @@ bool CCollider::CollisionTriangleRay(
 		return false;
 	}
 
-	//ヒット情報に交点を設定
+	//ヒット情報に交点と距離を設定
 	h->cross = cross;
+	h->dist = (cross - rs).Length();
 
 	//調整値計算（衝突しない位置まで戻す）
 	if (dots < 0.0f) {
