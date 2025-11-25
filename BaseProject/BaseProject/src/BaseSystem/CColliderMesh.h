@@ -33,8 +33,23 @@ public:
 	// デストラクタ
 	~CColliderMesh();
 
+	// 頂点情報をリセット
+	void Reset();
+
+	// メッシュに三角形を追加
+	void AddTriangle(const CVector& t0, const CVector& t1, const CVector& t2);
+
+	// メッシュを分割（生成時に指定した分割数で分割）
+	void DivisionMesh();
+	// メッシュを分割（分割数指定版）
+	void DivisionMesh(int divX, int divY, int divZ);
+
+	// モデルデータのメッシュを設定
 	void Set(CModel* model);
+
+	// メッシュの三角形リストを取得
 	const std::vector<STVertexData>& Get() const;
+	// 分割メッシュのリストを取得
 	const std::vector<STDivMesh>& GetDivMesh() const;
 
 #if _DEBUG
@@ -57,6 +72,7 @@ private:
 	int mDivX;
 	int mDivY;
 	int mDivZ;
+	CBounds mVtxBounds;
 };
 
 #endif

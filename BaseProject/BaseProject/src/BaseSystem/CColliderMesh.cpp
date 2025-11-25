@@ -12,7 +12,6 @@ CColliderMesh::CColliderMesh(CObjectBase* owner, ELayer layer, CModel* model,
 	SetShow(false);
 
 	Set(model);
-	UpdateCol(true);
 }
 
 CColliderMesh::~CColliderMesh()
@@ -20,48 +19,48 @@ CColliderMesh::~CColliderMesh()
 	mVertices.clear();
 }
 
-void CColliderMesh::Set(CModel* model)
+// 頂点情報をリセット
+void CColliderMesh::Reset()
 {
 	mVertices.clear();
 	mDivMesh.clear();
-	if (model == nullptr) return;
+}
 
-	CBounds bounds;
-	auto triangles = model->Triangles();
-	int count = triangles.size();
-	mVertices.reserve(count);
-	for (int i = 0; i < count; i++)
+// メッシュに三角形を追加
+void CColliderMesh::AddTriangle(const CVector& t0, const CVector& t1, const CVector& t2)
+{
+	STVertex v(t0, t1, t2);
+	mVertices.push_back({ v, v });
+
+	if (mVtxBounds.Size().LengthSqr() == 0.0f)
 	{
-		auto& tri = triangles[i];
-		STVertex v(tri.V0(), tri.V1(), tri.V2());
-		mVertices.push_back({ v, v });
-
-		if (i == 0)
-		{
-			bounds = CBounds::GetTriangleBounds
-			(
-				v.V[0], v.V[1], v.V[2]
-			);
-		}
-		else
-		{
-			CVector min = bounds.Min();
-			CVector max = bounds.Max();
-			for (int i = 0; i < 3; i++)
-			{
-				min = CVector::Min(min, v.V[i]);
-				max = CVector::Max(max, v.V[i]);
-			}
-			bounds.SetRange(min, max);
-		}
+		mVtxBounds = CBounds::GetTriangleBounds
+		(
+			v.V[0], v.V[1], v.V[2]
+		);
 	}
+	else
+	{
+		CVector min = mVtxBounds.Min();
+		CVector max = mVtxBounds.Max();
+		for (int i = 0; i < 3; i++)
+		{
+			min = CVector::Min(min, v.V[i]);
+			max = CVector::Max(max, v.V[i]);
+		}
+		mVtxBounds.SetRange(min, max);
+	}
+}
 
+// メッシュを分割
+void CColliderMesh::DivisionMesh()
+{
 	int divCnt = mDivX * mDivY * mDivZ;
 	if (divCnt > 1)
 	{
 		mDivMesh.reserve(divCnt);
-		CVector start = bounds.Min();
-		CVector size = bounds.Size();
+		CVector start = mVtxBounds.Min();
+		CVector size = mVtxBounds.Size();
 		CVector min, max;
 		for (int x = 0; x < mDivX; x++)
 		{
@@ -98,20 +97,52 @@ void CColliderMesh::Set(CModel* model)
 	else
 	{
 		STDivMesh dm;
-		dm.bounds = bounds;
+		dm.bounds = mVtxBounds;
 		for (STVertexData& v : mVertices)
 		{
 			dm.vertices.push_back(&v);
 		}
 		mDivMesh.push_back(dm);
 	}
+
+	UpdateCol(true);
 }
 
+// メッシュを分割
+void CColliderMesh::DivisionMesh(int divX, int divY, int divZ)
+{
+	mDivX = divX;
+	mDivY = divY;
+	mDivZ = divZ;
+
+	DivisionMesh();
+}
+
+// モデルデータのメッシュを設定
+void CColliderMesh::Set(CModel* model)
+{
+	Reset();
+	if (model == nullptr) return;
+
+	auto triangles = model->Triangles();
+	int count = triangles.size();
+	mVertices.reserve(count);
+	for (int i = 0; i < count; i++)
+	{
+		auto& tri = triangles[i];
+		AddTriangle(tri.V0(), tri.V1(), tri.V2());
+	}
+
+	DivisionMesh(mDivX, mDivY, mDivZ);
+}
+
+// メッシュの三角形リストを取得
 const std::vector<STVertexData>& CColliderMesh::Get() const
 {
 	return mVertices;
 }
 
+// 分割メッシュのリストを取得
 const std::vector<STDivMesh>& CColliderMesh::GetDivMesh() const
 {
 	return mDivMesh;
