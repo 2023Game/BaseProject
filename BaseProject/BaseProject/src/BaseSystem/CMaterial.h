@@ -23,6 +23,8 @@ private:
 	float mSpecular[3];
 	float mEmissive[3];
 
+	//ディレクトリのパス
+	std::string mDirPath;
 	//テクスチャファイル名
 	char* mpTextureFilename;
 	//マテリアル名
@@ -45,6 +47,10 @@ public:
 	~CMaterial();
 	//マテリアルを有効にする
 	void Enabled(const CColor& color);
+	//ディレクトリパスを取得
+	std::string DirPath() const;
+	//ディレクトリパスを設定
+	void DirPath(std::string path);
 	//マテリアルの名前の取得
 	char* Name();
 	//マテリアルの名前を設定する

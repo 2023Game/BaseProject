@@ -51,6 +51,13 @@ public:
 	// エフェクト用の設定
 	void SetupEffectSettings();
 
+	// マテリアル数を取得
+	int GetMaterialCount() const;
+	// マテリアルを取得
+	CMaterial* GetMaterial(int no = 0) const;
+	// マテリアルを設定
+	void SetMaterial(CMaterial* mat, int no = 0);
+
 	// 描画
 	void Render();
 	// 描画
@@ -67,6 +74,8 @@ private:
 
 	// マテリアルポインタの可変長配列
 	std::vector<CMaterial*> mpMaterials;
+	// 外部から設定したマテリアルのリスト
+	std::vector<CMaterial*> mpSetMaterials;
 	// 三角形の可変長配列
 	std::vector<CTriangle> mTriangles;
 	// 頂点の配列

@@ -49,6 +49,7 @@ void CMaterial::Disabled()
 CMaterial::CMaterial()
 	: mVertexNum(0)
 	, mPower(0)
+	, mDirPath("")
 	, mpTextureFilename(nullptr)
 	, mpTexture(nullptr)
 	, mBlendType(EBlend::eAlpha)
@@ -149,6 +150,16 @@ void CMaterial::Enabled(const CColor& color)
 		//テクスチャをバインドする
 		glBindTexture(GL_TEXTURE_2D, mpTexture->Id());
 	}
+}
+//ディレクトリパスを取得
+std::string CMaterial::DirPath() const
+{
+	return mDirPath;
+}
+//ディレクトリパスを設定
+void CMaterial::DirPath(std::string path)
+{
+	mDirPath = path;
 }
 //マテリアルの名前の取得
 char* CMaterial::Name()

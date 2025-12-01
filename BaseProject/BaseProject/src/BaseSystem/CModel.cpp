@@ -136,6 +136,10 @@ bool CModel::Load(std::string path, bool dontDelete)
 
 	CreateVertexBuffer();
 
+	// 読み込んだマテリアルのリストの個数分、
+	// 外部から設定するマテリアルリストの要素を追加
+	mpSetMaterials.resize(mpMaterials.size(), nullptr);
+
 	return true;
 }
 
@@ -182,6 +186,8 @@ bool CModel::LoadMaterial(std::string path, bool dontDelete)
 		//先頭がnewmtlの時、マテリアルを追加する
 		if (strcmp(str[0], "newmtl") == 0) {
 			CMaterial* pm = new CMaterial();
+			//ディレクトリパスを設定
+			pm->DirPath(dirPath);
 			//マテリアル名の設定
 			pm->Name(str[1]);
 			//マテリアルの可変長配列に追加
@@ -220,12 +226,17 @@ void CModel::Render()
 
 	//可変長配列の要素数だけ繰り返し
 	for (int i = 0; i < mTriangles.size(); i++) {
+		CMaterial* baseMat = mpMaterials[mTriangles[i].MaterialIdx()];
+		CMaterial* setMat = mpSetMaterials[mTriangles[i].MaterialIdx()];
+
 		//マテリアルの適用
-		mpMaterials[mTriangles[i].MaterialIdx()]->Enabled(mColor);
+		if (setMat == nullptr) baseMat->Enabled(mColor);
+		else setMat->Enabled(mColor);
 		//可変長配列に添え字でアクセスする
 		mTriangles[i].Render();
 		//マテリアルを無効
-		mpMaterials[mTriangles[i].MaterialIdx()]->Disabled();
+		if (setMat == nullptr) baseMat->Disabled();
+		else setMat->Disabled();
 	}
 }
 
@@ -333,6 +344,26 @@ void CModel::SetupEffectSettings()
 	SetBlend(EBlend::eAdd);
 }
 
+// マテリアル数を取得
+int CModel::GetMaterialCount() const
+{
+	return mpMaterials.size();
+}
+
+// マテリアルを取得
+CMaterial* CModel::GetMaterial(int no) const
+{
+	if (!(0 <= no && no < mpMaterials.size())) return nullptr;
+	return mpMaterials[no];
+}
+
+// マテリアルを設定
+void CModel::SetMaterial(CMaterial* mat, int no)
+{
+	if (!(0 <= no && no < mpSetMaterials.size())) return;
+	mpSetMaterials[no] = mat;
+}
+
 //描画
 //Render(行列)
 void CModel::Render(const CMatrix& m)
@@ -365,14 +396,22 @@ void CModel::Render(const CMatrix& m)
 	int first = 0; //描画位置
 	//マテリアル毎に描画する
 	for (size_t i = 0; i < mpMaterials.size(); i++) {
+		CMaterial* baseMat = mpMaterials[i];
+		CMaterial* setMat = mpSetMaterials[i];
+
 		//マテリアルを適用する
-		mpMaterials[i]->Enabled(mColor);
+		if (setMat == nullptr) baseMat->Enabled(mColor);
+		else setMat->Enabled(mColor);
+
 		//描画位置からのデータで三角形を描画します
-		glDrawArrays(GL_TRIANGLES, first, mpMaterials[i]->VertexNum());
+		glDrawArrays(GL_TRIANGLES, first, baseMat->VertexNum());
+
 		//マテリアルを無効にする
-		mpMaterials[i]->Disabled();
+		if (setMat == nullptr) baseMat->Disabled();
+		else setMat->Disabled();
+
 		//描画位置を移動
-		first += mpMaterials[i]->VertexNum();
+		first += baseMat->VertexNum();
 	}
 	//行列を戻す
 	glPopMatrix();
