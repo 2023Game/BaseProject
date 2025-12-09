@@ -121,7 +121,7 @@ bool CNavManager::CanConnectNavNode(CNavNode* node, CNavNode* other, float dista
 	if (node->IsBlockedNode(other)) return false;
 
 	// 目的地専用ノードは距離を考慮しない
-	//if (!node->mIsDestNode)
+	if (!node->mIsDestNode)
 	{
 		// 指定された距離の限界値を超える場合は、スルー
 		float dist = (other->GetPos() - node->GetPos()).LengthSqr();
@@ -406,15 +406,15 @@ void CNavManager::Render()
 	}
 
 	// 最後に求めた最短経路にラインを引く
-	//glDisable(GL_DEPTH_TEST);
-	//int size = mLastCalcRoute.size();
-	//for (int i = 0; i < size - 1; i++)
-	//{
-	//	CVector start = mLastCalcRoute[i]->GetOffsetPos();
-	//	CVector end = mLastCalcRoute[i + 1]->GetOffsetPos();
-	//	Primitive::DrawLine(start, end, CColor::cyan, 4.0f);
-	//}
-	//glEnable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST);
+	int size = mLastCalcRoute.size();
+	for (int i = 0; i < size - 1; i++)
+	{
+		CVector start = mLastCalcRoute[i]->GetOffsetPos();
+		CVector end = mLastCalcRoute[i + 1]->GetOffsetPos();
+		Primitive::DrawLine(start, end, CColor::cyan, 4.0f);
+	}
+	glEnable(GL_DEPTH_TEST);
 #endif
 }
 
