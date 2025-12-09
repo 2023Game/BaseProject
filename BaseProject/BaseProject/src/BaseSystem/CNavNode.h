@@ -78,6 +78,10 @@ public:
 
 	// ノードの色設定（デバッグ用）
 	void SetColor(const CColor& color);
+	// ノードの名前設定（デバッグ用）
+	void SetName(std::string name);
+	// ノードの名前取得（デバッグ用）
+	std::string GetName() const;
 	// ノードを更新
 	void Update();
 	// ノードを描画（デバッグ用）
@@ -114,8 +118,9 @@ private:
 	float mCalcMoveCost;		// 開始ノードからこのノードまでに掛かった移動コスト
 	CNavNode* mpCalcFromNode;	// 最短経路での前のノードのポインタ
 	bool mIsUpdateConnectNode;	// 接続ノードを更新する必要があるか
-	bool mIsUpdaingConnectNode;	// 接続ノードを更新中か
+	bool mIsUpdatingConnectNode;	// 接続ノードを更新中か
 
 	// デバッグ関連
 	CColor mColor;		// ノードの色
+	std::string mName;	// ノードの名前
 };
