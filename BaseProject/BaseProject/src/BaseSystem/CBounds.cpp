@@ -83,6 +83,14 @@ bool CBounds::Intersect(const CBounds& b0, const CBounds& b1)
 		&& b0.mMax.Z() >= b1.mMin.Z();
 }
 
+// 指定した座標がバウンディングボックスの内部かどうか
+bool CBounds::Contains(const CBounds& b, const CVector& p)
+{
+	return b.mMin.X() <= p.X() && p.X() <= b.mMax.X()
+		&& b.mMin.Y() <= p.Y() && p.Y() <= b.mMax.Y()
+		&& b.mMin.Z() <= p.Z() && p.Z() <= b.mMax.Z();
+}
+
 // 線分のバウンディングボックスを取得
 CBounds CBounds::GetLineBounds(const CVector& ls, const CVector& le)
 {
@@ -130,5 +138,18 @@ CBounds CBounds::GetCapsuleBounds(const CVector& cs, const CVector& ce, float cr
 
 	CBounds ret;
 	ret.SetRange(min, max);
+	return ret;
+}
+
+// ボックスのバウンディングボックスを取得
+CBounds CBounds::GetBoxBounds(const CVector& bp, const CVector(&ba)[3], const CVector& bs)
+{
+	CVector extents =
+		CVector::Abs(ba[0]) * bs.X() +
+		CVector::Abs(ba[1]) * bs.Y() +
+		CVector::Abs(ba[2]) * bs.Z();
+
+	CBounds ret;
+	ret.SetRange(bp - extents, bp + extents);
 	return ret;
 }

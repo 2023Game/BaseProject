@@ -338,6 +338,15 @@ CMatrix CMatrix::Identity()
 	return *this;
 }
 
+//ƒXƒP[ƒ‹’læ“¾
+CVector CMatrix::Scale() const
+{
+	float sx = CVector(mM[0][0], mM[0][1], mM[0][2]).Length();
+	float sy = CVector(mM[1][0], mM[1][1], mM[1][2]).Length();
+	float sz = CVector(mM[2][0], mM[2][1], mM[2][2]).Length();
+	return CVector(sx, sy, sz);
+}
+
 //Šg‘åk¬s—ñ‚Ìì¬
 //Scale(”{—¦X, ”{—¦Y, ”{—¦Z)
 CMatrix CMatrix::Scale(float sx, float sy, float sz)

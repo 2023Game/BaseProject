@@ -73,6 +73,14 @@ namespace Math
 	/// <param name="t">補間割合</param>
 	/// <returns></returns>
 	float LerpUnclamped(float a, float b, float t);
+	/// <summary>
+	/// 角度を線形補間する
+	/// </summary>
+	/// <param name="a">開始角度</param>
+	/// <param name="b">終了角度</param>
+	/// <param name="t">補間割合（0.0f～1.0f）</param>
+	/// <returns></returns>
+	float LerpAngle(float a, float b, float t);
 
 	/// <summary>
 	/// 0から指定値の範囲でループさせる
@@ -88,4 +96,17 @@ namespace Math
 	/// <param name="length">範囲の最大値</param>
 	/// <returns>ループさせた結果</returns>
 	int Repeat(int t, int length);
+
+	/// <summary>
+	/// 角度を0°～360°で正規化（ディグリー）
+	/// </summary>
+	/// <param name="angle">正規化する角度</param>
+	/// <returns>正規化した角度</returns>
+	float NormalizeAngle(float angle);
+	/// <summary>
+	/// 角度を-180°～180°で正規化（ディグリー）
+	/// </summary>
+	/// <param name="angle">正規化する角度</param>
+	/// <returns>正規化した角度</returns>
+	float NormalizeAngle180(float angle);
 }

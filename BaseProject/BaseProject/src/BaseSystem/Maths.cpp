@@ -64,6 +64,13 @@ float Math::LerpUnclamped(float a, float b, float t)
 	return a + (b - a) * t;
 }
 
+// 角度を線形補間する
+float Math::LerpAngle(float a, float b, float t)
+{
+	float delta = NormalizeAngle180(b - a);
+	return NormalizeAngle(a + delta * t);
+}
+
 // 0から指定値の範囲でループさせる
 float Math::Repeat(float t, float length)
 {
@@ -76,4 +83,18 @@ int Math::Repeat(int t, int length)
 {
 	int v = t % length;
 	return v < 0 ? v + length : v;
+}
+
+// 角度を0°～360°で正規化（ディグリー）
+float Math::NormalizeAngle(float angle)
+{
+	return Repeat(angle, 360.0f);
+}
+
+// 角度を-180°～180°で正規化（ディグリー）
+float Math::NormalizeAngle180(float angle)
+{
+	angle = NormalizeAngle(angle);
+	if (angle > 180.0f) angle -= 360.0f;
+	return angle;
 }

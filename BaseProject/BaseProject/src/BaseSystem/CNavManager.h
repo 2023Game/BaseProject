@@ -16,7 +16,7 @@ public:
 	// デストラクタ
 	~CNavManager();
 
-	// 経路単サック用のノードを追加
+	// 経路探索用のノードを追加
 	void AddNode(CNavNode* node);
 	// 経路探索用のノードを取り除く
 	void RemoveNode(CNavNode* node);
@@ -64,6 +64,14 @@ public:
 	/// </summary>
 	/// <param name="col"></param>
 	void RemoveCollider(CCollider* col);
+
+	// 一番近いノードを取得
+	CNavNode* FindNearestNode(const CVector& pos);
+	// 登録しているコライダーとのレイ判定
+	bool IsReachableByRay(const CVector& start, const CVector& end);
+
+	// 初期化
+	void Clear();
 
 	// 全てのノードを更新
 	void Update() override;

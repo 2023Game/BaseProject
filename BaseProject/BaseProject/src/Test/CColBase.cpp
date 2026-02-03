@@ -99,6 +99,9 @@ void CColBase::Update()
 			Position(Position() + move * moveSpeed);
 		}
 	}
+
+	// [SPACE]‚ğ‰Ÿ‚µ‚Ä‚¢‚éŠÔ‚ÍA“–‚½‚è”»’è‚ğƒIƒt‚É‚·‚é
+	SetEnableCol(!CDebugInput::Key(VK_SPACE));
 #endif
 }
 

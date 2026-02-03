@@ -1,32 +1,30 @@
-#include "CColTriangle.h"
+#include "CColBox.h"
 #include "Primitive.h"
 
 // コンストラクタ
-CColTriangle::CColTriangle(const CVector& v0, const CVector& v1, const CVector& v2, const CColor& defaultColor,
+CColBox::CColBox(const CVector& halfSize,
+	const CColor& defaultColor,
 	bool isKinematic, float weight)
 	: CColBase(defaultColor)
+	, mHalfSize(halfSize)
 {
-	mVertices[0] = v0;
-	mVertices[1] = v1;
-	mVertices[2] = v2;
-
-	mpCollider = new CColliderTriangle
+	mpCollider = new CColliderBox
 	(
 		this, ELayer::eTest,
-		mVertices[0], mVertices[1], mVertices[2],
+		mHalfSize,
 		isKinematic, weight
 	);
 	mpCollider->SetCollisionLayers({ ELayer::eTest });
 }
 
 // デストラクタ
-CColTriangle::~CColTriangle()
+CColBox::~CColBox()
 {
 	SAFE_DELETE(mpCollider);
 }
 
 // 衝突処理
-void CColTriangle::Collision(CCollider* self, CCollider* other, const CHitInfo& hit)
+void CColBox::Collision(CCollider* self, CCollider* other, const CHitInfo& hit)
 {
 	CColBase::Collision(self, other, hit);
 
@@ -41,14 +39,16 @@ void CColTriangle::Collision(CCollider* self, CCollider* other, const CHitInfo& 
 }
 
 // 描画
-void CColTriangle::Render()
+void CColBox::Render()
 {
 	CMatrix m = mpCollider->Matrix();
-	Primitive::DrawWireTriangle
-	(
-		m * mVertices[0],
-		m * mVertices[1],
-		m * mVertices[2],
-		GetColor()
-	);
+
+	CMatrix sm;
+	sm.Scale(mHalfSize * 2.0f);
+
+	Primitive::DrawWireBox(sm * m, GetColor());
+
+	CMatrix ctm;
+	ctm.Translate(Position());
+	Primitive::DrawSphere(ctm, 0.2f, GetColor());
 }

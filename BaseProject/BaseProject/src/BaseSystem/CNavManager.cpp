@@ -6,6 +6,8 @@
 
 // 1フレームで調べる接続ノードの数
 #define FIND_CONNECT_NODE_COUNT 10
+// レイの幅
+#define RAY_WIDTH 1.0f
 
 CNavManager* CNavManager::spInstance = nullptr;
 
@@ -23,14 +25,17 @@ CNavManager::CNavManager()
 	, mFindNodeDistance(0.0f)
 	, mNextFindNodeIndex(-1)
 {
-	assert(spInstance == nullptr);
+	assert(spInstance == nullptr || spInstance->IsKill());
 	spInstance = this;
 }
 
 // デストラクタ
 CNavManager::~CNavManager()
 {
-	spInstance = nullptr;
+	if (spInstance == this)
+	{
+		spInstance = nullptr;
+	}
 
 	auto itr = mNodes.begin();
 	auto end = mNodes.end();
@@ -42,7 +47,7 @@ CNavManager::~CNavManager()
 	}
 }
 
-// 経路単サック用のノードを追加
+// 経路探索用のノードを追加
 void CNavManager::AddNode(CNavNode* node)
 {
 	mNodes.push_back(node);
@@ -121,7 +126,7 @@ bool CNavManager::CanConnectNavNode(CNavNode* node, CNavNode* other, float dista
 	if (node->IsBlockedNode(other)) return false;
 
 	// 目的地専用ノードは距離を考慮しない
-	if (!node->mIsDestNode)
+	//if (!node->mIsDestNode)
 	{
 		// 指定された距離の限界値を超える場合は、スルー
 		float dist = (other->GetPos() - node->GetPos()).LengthSqr();
@@ -137,7 +142,7 @@ bool CNavManager::CanConnectNavNode(CNavNode* node, CNavNode* other, float dista
 	for (CCollider* col : mColliders)
 	{
 		// ヒットしていたら、ヒットフラグをtrueにしてチェック終了
-		if (CCollider::CollisionRay(col, start, end, &hit))
+		if (CCollider::CollisionRay(col, start, end, &hit, RAY_WIDTH))
 		{
 			isHit = true;
 			break;
@@ -289,6 +294,67 @@ void CNavManager::RemoveCollider(CCollider* col)
 	mColliders.erase(result, mColliders.end());
 }
 
+// 一番近いノードを取得
+CNavNode* CNavManager::FindNearestNode(const CVector& pos)
+{
+	CNavNode* nearNode = nullptr;
+	// とりあえず、最大の距離を入れておく
+	float bestDist = FLT_MAX;
+
+	// 全てのノードをチェック
+	for (CNavNode* node : mNodes)
+	{
+		if (!node->IsEnable()) continue;
+
+		// 距離をチェック
+		float d = (node->GetPos() - pos).LengthSqr();
+		if (d >= bestDist)	continue;
+
+		// 到達可能かをチェック
+		if (!IsReachableByRay(pos, node->GetOffsetPos())) continue;
+
+		bestDist = d;
+		nearNode = node;
+	}
+	return nearNode;
+}
+
+// 登録しているコライダーとのレイ判定
+bool CNavManager::IsReachableByRay(const CVector& start, const CVector& end)
+{
+	CHitInfo hit;
+	for (CCollider* col : mColliders)
+	{
+		if (CCollider::CollisionRay(col, start, end, &hit, RAY_WIDTH))
+			return false;
+	}
+	return true;
+}
+
+// 初期化
+void CNavManager::Clear()
+{
+	// 更新中ノードをリセット
+	mpUpdateNode = nullptr;
+	mNextFindNodeIndex = -1;
+
+	// 更新待ちリストをクリア
+	mUpdateConnectNodes.clear();
+
+	// 経路データクリア
+	mLastCalcRoute.clear();
+
+	// コライダー参照をクリア（超重要）
+	mColliders.clear();
+
+	// ノードを全削除
+	for (CNavNode* node : mNodes)
+	{
+		delete node;
+	}
+	mNodes.clear();
+}
+
 // 接続ノードを更新
 void CNavManager::UpdateConnectNavNode()
 {
@@ -390,7 +456,7 @@ void CNavManager::Update()
 void CNavManager::Render()
 {
 #if _DEBUG
-	// [SPACE]キーで経路探索ノードの描画モードを切り替え
+	// [N]キーで経路探索ノードの描画モードを切り替え
 	if (CDebugInput::PushKey('N'))
 	{
 		mIsRender = !mIsRender;
@@ -406,15 +472,15 @@ void CNavManager::Render()
 	}
 
 	// 最後に求めた最短経路にラインを引く
-	glDisable(GL_DEPTH_TEST);
-	int size = mLastCalcRoute.size();
-	for (int i = 0; i < size - 1; i++)
-	{
-		CVector start = mLastCalcRoute[i]->GetOffsetPos();
-		CVector end = mLastCalcRoute[i + 1]->GetOffsetPos();
-		Primitive::DrawLine(start, end, CColor::cyan, 4.0f);
-	}
-	glEnable(GL_DEPTH_TEST);
+	//glDisable(GL_DEPTH_TEST);
+	//int size = mLastCalcRoute.size();
+	//for (int i = 0; i < size - 1; i++)
+	//{
+	//	CVector start = mLastCalcRoute[i]->GetOffsetPos();
+	//	CVector end = mLastCalcRoute[i + 1]->GetOffsetPos();
+	//	Primitive::DrawLine(start, end, CColor::cyan, 4.0f);
+	//}
+	//glEnable(GL_DEPTH_TEST);
 #endif
 }
 

@@ -11,6 +11,8 @@ public:
 	// デストラクタ
 	~CColTriangle();
 
+	void Collision(CCollider* self, CCollider* other, const CHitInfo& hit) override;
+
 	// 描画
 	void Render() override;
 

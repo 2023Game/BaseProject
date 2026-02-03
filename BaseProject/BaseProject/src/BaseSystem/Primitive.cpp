@@ -159,6 +159,38 @@ void Primitive::DrawTriangle(const CVector& v0, const CVector& v1, const CVector
 	glPopMatrix();
 }
 
+// ワイヤーフレームの三角形を描画
+void Primitive::DrawWireTriangle(const CVector& v0, const CVector& v1, const CVector& v2, const CColor& color, EBlend blend)
+{
+	// 現在の行列を退避しておく
+	glPushMatrix();
+
+	// ブレンド処理を有効化
+	Blend::EnableBlend(blend);
+	// ライトオフ
+	glDisable(GL_LIGHTING);
+
+	// DIFFUSE赤色設定
+	float c[] = { color.R(), color.G(), color.B(), color.A() };
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, c);
+	glColor4fv(c);
+
+	// 三角形を描画
+	glBegin(GL_LINE_LOOP);
+	glVertex3f(v0.X(), v0.Y(), v0.Z());
+	glVertex3f(v1.X(), v1.Y(), v1.Z());
+	glVertex3f(v2.X(), v2.Y(), v2.Z());
+	glEnd();
+
+	// ライトオン
+	glEnable(GL_LIGHTING);
+	// ブレンド処理を無効化
+	Blend::DisableBlend();
+
+	// 描画前の行列に戻す
+	glPopMatrix();
+}
+
 // 板ポリゴンを描画
 void Primitive::DrawQuad(const CMatrix& m, const CVector2& size,
 	const CColor& color, EBlend blend)
@@ -422,15 +454,21 @@ int boxWireIdx[24] =
 // ボックスを描画
 void Primitive::DrawBox(const CVector& center, const CVector& size, const CColor& color, EBlend blend)
 {
-	// 現在の行列を退避しておく
-	glPushMatrix();
-
 	CMatrix tm;
 	tm.Translate(center);
 	CMatrix sm;
 	sm.Scale(size);
+	DrawBox(sm * tm, color, blend);
+}
+
+// ボックスを描画（行列版）
+void Primitive::DrawBox(const CMatrix& m, const CColor& color, EBlend blend)
+{
+	// 現在の行列を退避しておく
+	glPushMatrix();
+
 	// 描画行列を反映
-	glMultMatrixf((sm * tm).M());
+	glMultMatrixf(m.M());
 
 	// ブレンド処理有効化
 	Blend::EnableBlend(blend);
@@ -462,15 +500,21 @@ void Primitive::DrawBox(const CVector& center, const CVector& size, const CColor
 // ワイヤーフレームのボックスを描画
 void Primitive::DrawWireBox(const CVector& center, const CVector& size, const CColor& color, EBlend blend)
 {
-	// 現在の行列を退避しておく
-	glPushMatrix();
-
 	CMatrix tm;
 	tm.Translate(center);
 	CMatrix sm;
 	sm.Scale(size);
+	DrawWireBox(sm * tm, color, blend);
+}
+
+// ワイヤーフレームのボックスを描画（行列版）
+void Primitive::DrawWireBox(const CMatrix& m, const CColor& color, EBlend blend)
+{
+	// 現在の行列を退避しておく
+	glPushMatrix();
+
 	// 描画行列を反映
-	glMultMatrixf((sm * tm).M());
+	glMultMatrixf(m.M());
 
 	// ブレンド処理有効化
 	Blend::EnableBlend(blend);

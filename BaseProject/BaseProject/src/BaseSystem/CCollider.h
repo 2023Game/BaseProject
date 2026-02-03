@@ -14,6 +14,7 @@ class CColliderLine;
 class CColliderSphere;
 class CColliderTriangle;
 class CColliderCapsule;
+class CColliderBox;
 class CColliderMesh;
 
 struct STVertexData
@@ -155,7 +156,7 @@ public:
 	void SetAttachMtx(const CMatrix* mtx);
 
 	// 行列を取得
-	CMatrix Matrix() const;
+	CMatrix Matrix() const override;
 
 	// バウンディングボックスを取得
 	const CBounds& Bounds() const;
@@ -279,6 +280,23 @@ public:
 		CHitInfo* hit, bool isLeftMain);
 
 	/// <summary>
+	/// 三角形とボックスの衝突判定
+	/// </summary>
+	/// <param name="t0">三角形の頂点1</param>
+	/// <param name="t1">三角形の頂点2</param>
+	/// <param name="t2">三角形の頂点3</param>
+	/// <param name="bp">ボックスの座標</param>
+	/// <param name="baX">ボックスのX軸ベクトル</param>
+	/// <param name="baY">ボックスのY軸ベクトル</param>
+	/// <param name="baZ">ボックスのZ軸ベクトル</param>
+	/// <param name="bs">ボックスの半サイズ</param>
+	/// <param name="hit">衝突した時の情報</param>
+	/// <returns>trueならば、衝突している</returns>
+	static bool CollisionTriangleBox(const CVector& t0, const CVector& t1, const CVector& t2,
+		const CVector& bp, const CVector& baX, const CVector& baY, const CVector& baZ, const CVector& bs,
+		CHitInfo* hit, bool isLeftMain);
+
+	/// <summary>
 	/// 球と球の衝突判定
 	/// </summary>
 	/// <param name="sp0">球1の座標</param>
@@ -315,6 +333,22 @@ public:
 	/// <returns>trueならば、衝突している</returns>
 	static bool CollisionSphereCapsule(const CVector& sp, const float sr,
 		const CVector& cs, const CVector& ce, float cr,
+		CHitInfo* hit, bool isLeftMain);
+
+	/// <summary>
+	/// 球とボックスの衝突判定
+	/// </summary>
+	/// <param name="sp">球の座標</param>
+	/// <param name="sr">球の半径</param>
+	/// <param name="bp">ボックスの座標</param>
+	/// <param name="baX">ボックスのX軸ベクトル</param>
+	/// <param name="baY">ボックスのY軸ベクトル</param>
+	/// <param name="baZ">ボックスのZ軸ベクトル</param>
+	/// <param name="bs">ボックスの半サイズ</param>
+	/// <param name="hit">衝突した時の情報</param>
+	/// <returns>trueならば、衝突している</returns>
+	static bool CollisionSphereBox(const CVector& sp, const float sr,
+		const CVector& bp, const CVector& baX, const CVector& baY, const CVector& baZ, const CVector& bs,
 		CHitInfo* hit, bool isLeftMain);
 
 	/// <summary>
@@ -359,6 +393,58 @@ public:
 		CHitInfo* hit, bool isLeftMain);
 
 	/// <summary>
+	/// カプセルとボックスの衝突判定
+	/// </summary>
+	/// <param name="cs">カプセルを構成する線分の始点</param>
+	/// <param name="ce">カプセルを構成する線分の終点</param>
+	/// <param name="cr">カプセルの半径</param>
+	/// <param name="bp">ボックスの座標</param>
+	/// <param name="baX">ボックスのX軸ベクトル</param>
+	/// <param name="baY">ボックスのY軸ベクトル</param>
+	/// <param name="baZ">ボックスのZ軸ベクトル</param>
+	/// <param name="bs">ボックスの半サイズ</param>
+	/// <param name="hit">衝突した時の情報</param>
+	/// <returns>trueならば、衝突している</returns>
+	static bool CollisionCapsuleBox(const CVector& cs, const CVector& ce, float cr,
+		const CVector& bp, const CVector& baX, const CVector& baY, const CVector& baZ, const CVector& bs,
+		CHitInfo* hit, bool isLeftMain);
+
+	/// <summary>
+	/// ボックスと線分の衝突判定
+	/// </summary>
+	/// <param name="bp">ボックスの座標</param>
+	/// <param name="baX">ボックスのX軸ベクトル</param>
+	/// <param name="baY">ボックスのY軸ベクトル</param>
+	/// <param name="baZ">ボックスのZ軸ベクトル</param>
+	/// <param name="bs">ボックスの半サイズ</param>
+	/// <param name="ls">線分の始点</param>
+	/// <param name="le">線分の終点</param>
+	/// <param name="hit">衝突した時の情報</param>
+	/// <returns>trueならば、衝突している</returns>
+	static bool CollisionBoxLine(const CVector& bp, const CVector& baX, const CVector& baY, const CVector& baZ, const CVector& bs,
+		const CVector& ls, const CVector& le,
+		CHitInfo* hit, bool isLeftMain);
+
+	/// <summary>
+	/// ボックスとボックスの衝突判定
+	/// </summary>
+	/// <param name="bp0">ボックス1の座標</param>
+	/// <param name="baX0">ボックス1のX軸ベクトル</param>
+	/// <param name="baY0">ボックス1のY軸ベクトル</param>
+	/// <param name="baZ0">ボックス1のZ軸ベクトル</param>
+	/// <param name="bs0">ボックス1の半サイズ</param>
+	/// <param name="bp1">ボックス2の座標</param>
+	/// <param name="baX1">ボックス2のX軸ベクトル</param>
+	/// <param name="baY1">ボックス2のY軸ベクトル</param>
+	/// <param name="baZ1">ボックス2のZ軸ベクトル</param>
+	/// <param name="bs1">ボックス2の半サイズ</param>
+	/// <param name="hit">衝突した時の情報</param>
+	/// <returns>trueならば、衝突している</returns>
+	static bool CollisionBox(const CVector& bp0, const CVector& baX0, const CVector& baY0, const CVector& baZ0, const CVector& bs0,
+		const CVector& bp1, const CVector& baX1, const CVector& baY1, const CVector& baZ1, const CVector& bs1,
+		CHitInfo* hit);
+
+	/// <summary>
 	/// メッシュと線分の衝突判定
 	/// </summary>
 	/// <param name="tris">メッシュを構成する三角形ポリゴンのリスト</param>
@@ -377,11 +463,12 @@ public:
 	/// <param name="mesh">メッシュデータ</param>
 	/// <param name="rs">レイの始点</param>
 	/// <param name="re">レイの終点</param>
+	/// <param name="rw">レイの幅</param>
 	/// <param name="rb">レイのバウンディングボックス</param>
 	/// <param name="hit">衝突した時の情報</param>
 	/// <returns>trueならば、衝突している</returns>
 	static bool CollisionMeshRay(CColliderMesh* mesh,
-		const CVector& rs, const CVector& re, const CBounds& rb,
+		const CVector& rs, const CVector& re, float rw, const CBounds& rb,
 		CHitInfo* hit, bool isLeftMain);
 
 	/// <summary>
@@ -413,6 +500,16 @@ public:
 	/// <returns>trueならば、衝突している</returns>
 	static bool CollisionMeshCapsule(const std::vector<STVertexData>& tris,
 		CColliderCapsule* capsuleCol, CHitInfo* hit, bool isLeftMain);
+
+	/// <summary>
+	/// メッシュとボックスの衝突判定
+	/// </summary>
+	/// <param name="tris">メッシュを構成する三角形ポリゴンのリスト</param>
+	/// <param name="boxCol">ボックスコライダー</param>
+	/// <param name="hit">衝突した時の情報</param>
+	/// <returns>trueならば、衝突している</returns>
+	static bool CollisionMeshBox(const std::vector<STVertexData>& tris,
+		CColliderBox* boxCol, CHitInfo* hit, bool isLeftMain);
 
 	/// <summary>
 	/// 点から線分までの最短距離を求める
@@ -456,6 +553,23 @@ public:
 	static CVector ClosestPointOnTriangle(const CVector& p, const CVector& t0, const CVector& t1, const CVector& t2);
 
 	/// <summary>
+	/// 指定した点と線分の最近接点を計算
+	/// </summary>
+	/// <param name="p"></param>
+	/// <param name="s"></param>
+	/// <param name="e"></param>
+	/// <returns></returns>
+	static CVector ClosestPointOnSegment(const CVector& p, const CVector& s, const CVector& e);
+
+	/// <summary>
+	/// 指定した点とAABBの最近接点を計算
+	/// </summary>
+	/// <param name="p"></param>
+	/// <param name="half"></param>
+	/// <returns></returns>
+	static CVector ClosestPointOnAABB(const CVector& p, const CVector& half);
+
+	/// <summary>
 	/// 衝突判定
 	/// </summary>
 	/// <param name="c0">コライダ1</param>
@@ -471,8 +585,9 @@ public:
 	/// <param name="start">レイの開始位置</param>
 	/// <param name="end">レイの終了位置</param>
 	/// <param name="hit">ヒットした時の情報</param>
+	/// <param name="rayWidth">レイの幅</param>
 	/// <returns>trueならば、衝突している</returns>
-	static bool CollisionRay(CCollider* c, const CVector& start, const CVector& end, CHitInfo* hit);
+	static bool CollisionRay(CCollider* c, const CVector& start, const CVector& end, CHitInfo* hit, float rayWidth = 0.0f);
 
 	/// <summary>
 	/// 衝突時の押し戻し割合を算出

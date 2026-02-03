@@ -20,6 +20,7 @@
     <ClCompile Include="src\BaseSystem\CButton.cpp" />
     <ClCompile Include="src\BaseSystem\CCamera.cpp" />
     <ClCompile Include="src\BaseSystem\CCollider.cpp" />
+    <ClCompile Include="src\BaseSystem\CColliderBox.cpp" />
     <ClCompile Include="src\BaseSystem\CColliderCapsule.cpp" />
     <ClCompile Include="src\BaseSystem\CColliderLine.cpp" />
     <ClCompile Include="src\BaseSystem\CColliderMesh.cpp" />
@@ -101,6 +102,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Test\CBootMenuScene.cpp" />
     <ClCompile Include="src\Test\CColBase.cpp" />
+    <ClCompile Include="src\Test\CColBox.cpp" />
     <ClCompile Include="src\Test\CColCapsule.cpp" />
     <ClCompile Include="src\Test\CColLine.cpp" />
     <ClCompile Include="src\Test\CCollisionTestScene.cpp" />
@@ -119,6 +121,7 @@
     <ClInclude Include="src\BaseSystem\CButton.h" />
     <ClInclude Include="src\BaseSystem\CCamera.h" />
     <ClInclude Include="src\BaseSystem\CCollider.h" />
+    <ClInclude Include="src\BaseSystem\CColliderBox.h" />
     <ClInclude Include="src\BaseSystem\CColliderCapsule.h" />
     <ClInclude Include="src\BaseSystem\CColliderLine.h" />
     <ClInclude Include="src\BaseSystem\CColliderMesh.h" />
@@ -208,6 +211,7 @@
     <ClInclude Include="src\Game\CXCharacter.h" />
     <ClInclude Include="src\Test\CBootMenuScene.h" />
     <ClInclude Include="src\Test\CColBase.h" />
+    <ClInclude Include="src\Test\CColBox.h" />
     <ClInclude Include="src\Test\CColCapsule.h" />
     <ClInclude Include="src\Test\CColLine.h" />
     <ClInclude Include="src\Test\CCollisionTestScene.h" />

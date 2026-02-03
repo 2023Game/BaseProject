@@ -46,6 +46,13 @@ public:
 	/// <param name="b1">2つ目のバウンディングボックス</param>
 	/// <returns>trueならば、交差している</returns>
 	static bool Intersect(const CBounds& b0, const CBounds& b1);
+	/// <summary>
+	/// 指定した座標がバウンディングボックスの内部かどうか
+	/// </summary>
+	/// <param name="b">バウンディングボックス</param>
+	/// <param name="p">確認する座標</param>
+	/// <returns>trueならば、内部に存在する</returns>
+	static bool Contains(const CBounds& b, const CVector& p);
 
 	/// <summary>
 	/// 線分のバウンディングボックスを取得
@@ -77,6 +84,14 @@ public:
 	/// <param name="cr">カプセルの半径</param>
 	/// <returns>バウンディングボックス</returns>
 	static CBounds GetCapsuleBounds(const CVector& cs, const CVector& ce, float cr);
+	/// <summary>
+	/// ボックスのバウンディングボックスを取得
+	/// </summary>
+	/// <param name="bp">ボックスの中心座標</param>
+	/// <param name="ba">ボックスの各軸ベクトルの配列</param>
+	/// <param name="bs">ボックスの各軸の半分サイズ</param>
+	/// <returns></returns>
+	static CBounds GetBoxBounds(const CVector& bp, const CVector(&ba)[3], const CVector& bs);
 
 private:
 	CVector mMin;	// 最小位置

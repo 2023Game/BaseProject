@@ -248,7 +248,13 @@ float CVector::Angle(const CVector& v0, const CVector& v1)
 {
 	float length = v0.Length() * v1.Length();
 	if (length == 0.0f) return 0.0f;
-	return acosf(Dot(v0, v1) / length);
+	return Math::RadianToDegree(acosf(Dot(v0, v1) / length));
+}
+
+// ベクトルのY軸角度を求める
+float CVector::AngleY(const CVector& v)
+{
+	return Math::RadianToDegree(atan2f(v.X(), -v.Z()));
 }
 
 // 2点間を線形補間する
@@ -262,6 +268,16 @@ CVector CVector::Lerp(const CVector& a, const CVector& b, float t)
 CVector CVector::LerpUnclamped(const CVector& a, const CVector& b, float t)
 {
 	return a + (b - a) * t;
+}
+
+// 角度を線形補間する
+CVector CVector::LerpAngle(const CVector& a, const CVector& b, float t)
+{
+	CVector v;
+	v.X(Math::LerpAngle(a.X(), b.X(), t));
+	v.Y(Math::LerpAngle(a.Y(), b.Y(), t));
+	v.Z(Math::LerpAngle(a.Z(), b.Z(), t));
+	return v;
 }
 
 // 2つのベクトル間を球面線形補間する
@@ -318,6 +334,12 @@ CVector CVector::Max(const CVector& a, const CVector& b)
 		std::max(a.Y(), b.Y()),
 		std::max(a.Z(), b.Z())
 	);
+}
+
+// ベクトルの各要素を絶対値に変換
+CVector CVector::Abs(const CVector& v)
+{
+	return CVector(abs(v.X()), abs(v.Y()), abs(v.Z()));
 }
 
 //------------------------------

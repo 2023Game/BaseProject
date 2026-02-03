@@ -50,6 +50,8 @@ public:
 	void Print();
 	//単位行列の作成
 	CMatrix Identity();
+	//スケール値取得
+	CVector Scale() const;
 	//拡大縮小行列の作成
 	//Scale(倍率X, 倍率Y, 倍率Z)
 	CMatrix Scale(float sx, float sy, float sz);

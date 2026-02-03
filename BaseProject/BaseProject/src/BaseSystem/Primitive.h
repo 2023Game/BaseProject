@@ -57,6 +57,17 @@ namespace Primitive
 		const CColor& color, EBlend blend = EBlend::eAlpha);
 
 	/// <summary>
+	/// ワイヤーフレームの三角形を描画
+	/// </summary>
+	/// <param name="v0">1つ目の頂点</param>
+	/// <param name="v1">2つ目の頂点</param>
+	/// <param name="v2">3つ目の頂点</param>
+	/// <param name="color">色</param>
+	/// <param name="blend">ブレンドタイプ</param>
+	void DrawWireTriangle(const CVector& v0, const CVector& v1, const CVector& v2,
+		const CColor& color, EBlend blend = EBlend::eAlpha);
+
+	/// <summary>
 	/// 板ポリゴンを描画
 	/// </summary>
 	/// <param name="m">描画行列</param>
@@ -111,6 +122,15 @@ namespace Primitive
 		const CColor& color, EBlend blend = EBlend::eAlpha);
 
 	/// <summary>
+	/// ボックスを描画（行列版）
+	/// </summary>
+	/// <param name="m">ボックスの行列</param>
+	/// <param name="color">ボックスの色</param>
+	/// <param name="blend">ブレンドタイプ</param>
+	void DrawBox(const CMatrix& m,
+		const CColor& color, EBlend blend = EBlend::eAlpha);
+
+	/// <summary>
 	/// ワイヤーフレームのボックスを描画
 	/// </summary>
 	/// <param name="center">中心座標</param>
@@ -118,5 +138,14 @@ namespace Primitive
 	/// <param name="color">ボックスの色</param>
 	/// <param name="blend">ブレンドタイプ</param>
 	void DrawWireBox(const CVector& center, const CVector& size,
+		const CColor& color, EBlend blend = EBlend::eAlpha);
+
+	/// <summary>
+	/// ワイヤーフレームのボックスを描画（行列版）
+	/// </summary>
+	/// <param name="m">ボックスの行列</param>
+	/// <param name="color">ボックスの色</param>
+	/// <param name="blend">ブレンドタイプ</param>
+	void DrawWireBox(const CMatrix& m,
 		const CColor& color, EBlend blend = EBlend::eAlpha);
 };

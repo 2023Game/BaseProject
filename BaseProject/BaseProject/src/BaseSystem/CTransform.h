@@ -32,7 +32,7 @@ public:
 	~CTransform();
 
 	// ワールド位置を取得
-	const CVector& Position() const;
+	virtual const CVector& Position() const;
 	/// <summary>
 	/// ワールド位置を設定
 	/// </summary>
@@ -62,12 +62,12 @@ public:
 	void LocalPosition(float x, float y, float z);
 
 	// ワールド回転値（クォータニオン）を取得
-	const CQuaternion& Rotation() const;
+	virtual const CQuaternion& Rotation() const;
 	// ローカル回転値（クォータニオン）を取得
 	const CQuaternion& LocalRotation() const;
 
 	// ワールド回転角度を取得（ディグリー）
-	CVector EulerAngles() const;
+	virtual CVector EulerAngles() const;
 	// ローカル回転角度を取得（ディグリー）
 	CVector LocalEulerAngles() const;
 
@@ -109,7 +109,7 @@ public:
 
 
 	// ワールドスケール値を取得
-	const CVector& Scale() const;
+	virtual const CVector& Scale() const;
 	// ローカルスケール値を取得
 	const CVector& LocalScale() const;
 
@@ -142,11 +142,11 @@ public:
 	virtual CMatrix Matrix() const;
 
 	// 正面方向のベクトルを取得
-	CVector VectorZ() const;
+	virtual CVector VectorZ() const;
 	// 横方向のベクトルを取得
-	CVector VectorX() const;
+	virtual CVector VectorX() const;
 	// 上方向のベクトルを取得
-	CVector VectorY() const;
+	virtual CVector VectorY() const;
 
 	/// <summary>
 	/// 平行移動（現在の向きに対しての移動）

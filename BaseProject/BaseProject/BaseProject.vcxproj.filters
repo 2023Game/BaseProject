@@ -388,6 +388,12 @@
     <ClCompile Include="src\BaseSystem\CNavNode.cpp">
       <Filter>ソース ファイル\BaseSystem\Navigation</Filter>
     </ClCompile>
+    <ClCompile Include="src\BaseSystem\CColliderBox.cpp">
+      <Filter>ソース ファイル\BaseSystem\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Test\CColBox.cpp">
+      <Filter>ソース ファイル\Test\CollisionTest</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\BaseSystem\CCollider.h">
@@ -704,6 +710,12 @@
     </ClInclude>
     <ClInclude Include="src\BaseSystem\CNavNode.h">
       <Filter>ソース ファイル\BaseSystem\Navigation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BaseSystem\CColliderBox.h">
+      <Filter>ソース ファイル\BaseSystem\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Test\CColBox.h">
+      <Filter>ソース ファイル\Test\CollisionTest</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
