@@ -347,12 +347,12 @@ void CNavManager::Clear()
 	// コライダー参照をクリア（超重要）
 	mColliders.clear();
 
-	// ノードを全削除
-	for (CNavNode* node : mNodes)
-	{
-		delete node;
-	}
-	mNodes.clear();
+	//// ノードを全削除
+	//for (CNavNode* node : mNodes)
+	//{
+	//	delete node;
+	//}
+	//mNodes.clear();
 }
 
 // 接続ノードを更新
@@ -437,7 +437,7 @@ void CNavManager::Update()
 {
 	// 更新中のノードがなければ、
 	// 削除フラグが立っているノードを削除
-	if (mpUpdateNode != nullptr)
+	if (mpUpdateNode == nullptr)
 	{
 		CheckKillNode();
 	}
